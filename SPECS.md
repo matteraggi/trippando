@@ -8,7 +8,7 @@ Runtime/Language: Node.js, TypeScript.
 
 Frontend Framework: React (Vite).
 
-UI Framework: Tailwind CSS + Konsta UI (Must be used for iOS-native look & feel components like Lists, Navbars, Modals).
+UI Framework: Tailwind CSS.
 
 Icons: lucide-react.
 
@@ -47,6 +47,12 @@ Collection: trips
 id (string): Auto-generated.
 
 name (string): The name of the trip.
+
+coverImage (string): URL to the trip's cover image.
+
+startDate (timestamp): The start date of the trip.
+
+endDate (timestamp): The end date of the trip.
 
 createdAt (serverTimestamp).
 

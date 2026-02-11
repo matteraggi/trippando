@@ -10,24 +10,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "date-fns": "^x.x.x",
-    "firebase": "^x.x.x",
-    "konsta": "^x.x.x",
-    "lucide-react": "^x.x.x",
-    "react": "^18.x.x",
-    "react-dom": "^18.x.x",
-    "react-router-dom": "^x.x.x"
+    "date-fns": "^4.1.0",
+    "firebase": "^12.9.0",
+    "lucide-react": "^0.563.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
-    "@types/react": "^18.3.28",
-    "@types/react-dom": "^18.3.7",
-    "@vitejs/plugin-react": "^x.x.x",
-    "autoprefixer": "^x.x.x",
-    "eslint": "^x.x.x",
-    "postcss": "^x.x.x",
-    "tailwindcss": "^3.4.17",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "autoprefixer": "^10.4.24",
+    "eslint": "^10.0.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
-    "vite": "^x.x.x",
-    "vite-plugin-pwa": "^x.x.x"
+    "vite": "^7.3.1",
+    "vite-plugin-pwa": "^1.2.0"
   }
 }
