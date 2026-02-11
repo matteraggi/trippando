@@ -1,0 +1,33 @@
+{
+  "name": "trippando",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "date-fns": "^x.x.x",
+    "firebase": "^x.x.x",
+    "konsta": "^x.x.x",
+    "lucide-react": "^x.x.x",
+    "react": "^18.x.x",
+    "react-dom": "^18.x.x",
+    "react-router-dom": "^x.x.x"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^x.x.x",
+    "autoprefixer": "^x.x.x",
+    "eslint": "^x.x.x",
+    "postcss": "^x.x.x",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.9.3",
+    "vite": "^x.x.x",
+    "vite-plugin-pwa": "^x.x.x"
+  }
+}
