@@ -9,10 +9,12 @@ import PrivateRoute from './components/PrivateRoute';
 import Home from './pages/Homepage';
 import TripDetails from './pages/TripDetails';
 import AddExpense from './pages/AddExpense';
+import NicknameModal from './components/NicknameModal';
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
+      <NicknameModal />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
