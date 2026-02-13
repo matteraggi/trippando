@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, Check, Calendar, CreditCard, Tag, AlignLeft, User } from 'lucide-react';
+import { X, Calendar, CreditCard, Tag, AlignLeft, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { addExpense, subscribeToExpenses } from '../services/expenseService';
+import { addExpense } from '../services/expenseService';
+import { getTrip } from '../services/tripService'; // Ensure this is imported
+import { getUsers, type UserProfile } from '../services/userService';
 import { EXPENSE_CATEGORIES, EXPENSE_CURRENCIES, type ExpenseCategory } from '../constants/expenseConstants';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -17,24 +19,35 @@ export default function AddExpense() {
     const [description, setDescription] = useState('');
     const [paidBy, setPaidBy] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [payerSuggestions, setPayerSuggestions] = useState<string[]>([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
 
-    // Load suggestions and set default payer
+    const [members, setMembers] = useState<UserProfile[]>([]);
+    const [loadingMembers, setLoadingMembers] = useState(true);
+
+    // Load trip members
     useEffect(() => {
         if (!tripId) return;
 
-        // Default to current user's name or email
-        if (currentUser) {
-            setPaidBy(currentUser.displayName || currentUser.email?.split('@')[0] || 'Me');
-        }
+        const loadData = async () => {
+            try {
+                const trip = await getTrip(tripId);
+                if (trip && trip.members && trip.members.length > 0) {
+                    const profiles = await getUsers(trip.members);
+                    setMembers(profiles);
 
-        const unsubscribe = subscribeToExpenses(tripId, (expenses) => {
-            const uniquePayers = Array.from(new Set(expenses.map(e => e.paidBy).filter(Boolean)));
-            setPayerSuggestions(uniquePayers);
-        });
-
-        return () => unsubscribe();
+                    // Default to current user if they are a member
+                    if (currentUser && trip.members.includes(currentUser.uid)) {
+                        setPaidBy(currentUser.uid);
+                    } else if (profiles.length > 0) {
+                        setPaidBy(profiles[0].uid);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to load members", error);
+            } finally {
+                setLoadingMembers(false);
+            }
+        };
+        loadData();
     }, [tripId, currentUser]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +63,7 @@ export default function AddExpense() {
                 currency,
                 category,
                 description,
-                paidBy,
+                paidBy, // This is now a UID (or empty string)
                 date: new Date(date),
                 tripId
             });
@@ -103,64 +116,53 @@ export default function AddExpense() {
                 {/* Form Fields */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
-                    {/* Paid By */}
-                    <div className="flex items-center p-4 border-b border-gray-50 relative z-20">
+                    {/* Paid By - Member Selector */}
+                    <div className="flex items-center p-4 border-b border-gray-50">
                         <User className="text-gray-400 mr-3" size={20} />
-                        <div className="flex-1 relative">
+                        <div className="flex-1">
                             <label className="text-xs text-gray-400 font-medium block mb-1">Paid by</label>
-                            <input
-                                type="text"
-                                value={paidBy}
-                                onChange={(e) => {
-                                    setPaidBy(e.target.value);
-                                    setShowSuggestions(true);
-                                }}
-                                onFocus={() => setShowSuggestions(true)}
-                                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay to allow click
-                                className="w-full outline-none text-gray-900 placeholder-gray-400 font-medium"
-                                placeholder="Who paid?"
-                            />
-
-                            {/* Custom Dropdown */}
-                            {showSuggestions && (payerSuggestions.length > 0 || paidBy) && (
-                                <div className="absolute left-0 top-full mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-                                    <div className="max-h-48 overflow-y-auto">
-                                        {/* Suggest 'Me' if not already selected */}
-                                        {currentUser && 'Me'.toLowerCase().includes(paidBy.toLowerCase()) && (
-                                            <button
-                                                className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center space-x-2 text-sm text-gray-700"
-                                                onClick={() => {
-                                                    setPaidBy('Me');
-                                                    setShowSuggestions(false);
-                                                }}
-                                            >
-                                                <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">M</div>
-                                                <span>Me</span>
-                                            </button>
-                                        )}
-                                        {payerSuggestions
-                                            .filter(p => p !== 'Me' && p.toLowerCase().includes(paidBy.toLowerCase()))
-                                            .map(payer => (
-                                                <button
-                                                    key={payer}
-                                                    className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center space-x-2 text-sm text-gray-700"
-                                                    onClick={() => {
-                                                        setPaidBy(payer);
-                                                        setShowSuggestions(false);
-                                                    }}
-                                                >
-                                                    <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs">
-                                                        {payer.charAt(0).toUpperCase()}
-                                                    </div>
-                                                    <span>{payer}</span>
-                                                </button>
-                                            ))}
-                                        {paidBy && !payerSuggestions.includes(paidBy) && paidBy !== 'Me' && (
-                                            <div className="px-4 py-2 text-xs text-gray-400 italic border-t border-gray-50">
-                                                Use "{paidBy}"
+                            {loadingMembers ? (
+                                <div className="h-6 bg-gray-100 rounded animate-pulse w-32"></div>
+                            ) : (
+                                <div className="flex space-x-3 overflow-x-auto p-1 -m-1 no-scrollbar">
+                                    {/* Me Option */}
+                                    {currentUser && tripId && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setPaidBy(currentUser.uid)}
+                                            className={`flex flex-shrink-0 items-center space-x-2 px-3 py-2 rounded-full border transition-all ${paidBy === currentUser.uid
+                                                ? 'bg-blue-600 border-blue-600 text-white shadow-md transform scale-105'
+                                                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                }`}
+                                        >
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${paidBy === currentUser.uid ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                Me
                                             </div>
-                                        )}
-                                    </div>
+                                            <span className="text-sm font-medium">Me</span>
+                                        </button>
+                                    )}
+
+                                    {/* Other Members */}
+                                    {members
+                                        .filter(m => m.uid !== currentUser?.uid)
+                                        .map(member => (
+                                            <button
+                                                key={member.uid}
+                                                type="button"
+                                                onClick={() => setPaidBy(member.uid)}
+                                                className={`flex flex-shrink-0 items-center space-x-2 px-3 py-2 rounded-full border transition-all ${paidBy === member.uid
+                                                    ? 'bg-blue-600 border-blue-600 text-white shadow-md transform scale-105'
+                                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${paidBy === member.uid ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                                                    }`}>
+                                                    {member.displayName.charAt(0).toUpperCase()}
+                                                </div>
+                                                <span className="text-sm font-medium whitespace-nowrap">{member.displayName}</span>
+                                            </button>
+                                        ))}
                                 </div>
                             )}
                         </div>

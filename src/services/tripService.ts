@@ -13,9 +13,26 @@ import {
     updateDoc,
     deleteDoc,
     getDocs,
-    writeBatch
+    writeBatch,
+    arrayUnion,
+    getDoc
 } from 'firebase/firestore';
 import type { Trip } from '../types/Trip';
+
+// ... (existing code)
+
+export const addTripMember = async (tripId: string, userId: string) => {
+    try {
+        const tripRef = doc(db, TRIPS_COLLECTION, tripId);
+        await updateDoc(tripRef, {
+            members: arrayUnion(userId),
+            updatedAt: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error adding member to trip:", error);
+        throw error;
+    }
+};
 
 const TRIPS_COLLECTION = 'trips';
 
@@ -98,4 +115,13 @@ export const deleteTrip = async (tripId: string) => {
         console.error("Error deleting trip:", error);
         throw error;
     }
+};
+
+export const getTrip = async (tripId: string): Promise<Trip | null> => {
+    const docRef = doc(db, TRIPS_COLLECTION, tripId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as Trip;
+    }
+    return null;
 };

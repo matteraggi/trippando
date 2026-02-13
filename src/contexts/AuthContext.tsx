@@ -7,6 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 interface AuthContextType {
     currentUser: User | null;
     loading: boolean;
+    error: string | null;
     login: (email: string, password: string) => Promise<void>;
     signup: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
@@ -26,11 +27,13 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         setPersistence(auth, browserLocalPersistence)
-            .catch((error) => {
-                console.error("Auth persistence error:", error);
+            .catch((err) => {
+                console.error("Auth persistence error:", err);
+                setError(err.message);
             });
 
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -38,8 +41,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
         });
 
-        getRedirectResult(auth).catch((error) => {
-            console.error("Redirect auth error:", error);
+        getRedirectResult(auth).catch((err) => {
+            console.error("Redirect auth error:", err);
+            setError(err.message);
         });
 
         return unsubscribe;
@@ -48,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const value = {
         currentUser,
         loading,
+        error,
         login: (email: string, password: string) => signInWithEmailAndPassword(auth, email, password).then(() => { }),
         signup: (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password).then(() => { }),
         logout: () => signOut(auth),

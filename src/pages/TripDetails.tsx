@@ -4,12 +4,14 @@ import { ChevronLeft, Calendar, MapPin, MoreHorizontal, ShoppingBag, Coffee, Car
 import * as LucideIcons from 'lucide-react';
 import { subscribeToTrip, updateTrip, deleteTrip } from '../services/tripService';
 import { subscribeToExpenses } from '../services/expenseService';
+import { getUsers } from '../services/userService';
 import type { Trip } from '../types/Trip';
 import type { Expense } from '../types/Expense';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { TRIP_ICONS } from '../constants/tripConstants';
 import TripModal from '../components/TripModal';
+import AddMemberModal from '../components/AddMemberModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const getCategoryIcon = (category: string) => {
@@ -32,6 +34,7 @@ export default function TripDetails() {
     const [loading, setLoading] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 
     // ... useEffect ...
 
@@ -57,12 +60,27 @@ export default function TripDetails() {
         }
     };
 
+
+
+    // ...
+
+    const [memberNames, setMemberNames] = useState<Record<string, string>>({});
+
     useEffect(() => {
         if (!tripId) return;
 
         const unsubscribeTrip = subscribeToTrip(tripId, (tripData) => {
             setTrip(tripData);
             setLoading(false);
+
+            // Fetch member names when trip data is loaded
+            if (tripData && tripData.members && tripData.members.length > 0) {
+                getUsers(tripData.members).then(users => {
+                    const names: Record<string, string> = {};
+                    users.forEach(u => names[u.uid] = u.displayName);
+                    setMemberNames(names);
+                });
+            }
         });
 
         const unsubscribeExpenses = subscribeToExpenses(tripId, (expenseList) => {
@@ -153,6 +171,16 @@ export default function TripDetails() {
                             <>
                                 <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)} />
                                 <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-2 animate-in fade-in zoom-in-95 duration-200">
+                                    <button
+                                        onClick={() => {
+                                            setIsMenuOpen(false);
+                                            setIsAddMemberModalOpen(true);
+                                        }}
+                                        className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center"
+                                    >
+                                        <div className="w-8 flex justify-center"><LucideIcons.UserPlus size={16} /></div>
+                                        Add Member
+                                    </button>
                                     <button
                                         onClick={() => {
                                             setIsMenuOpen(false);
@@ -252,7 +280,7 @@ export default function TripDetails() {
                                         <div className="flex-1 min-w-0">
                                             <p className="text-gray-900 font-medium truncate">{expense.description || expense.category}</p>
                                             <p className="text-xs text-gray-500 truncate">
-                                                {formatExpenseDate(expense.date)} • {expense.paidBy ? <span className="text-blue-500 font-medium">Paid by {expense.paidBy}</span> : expense.category}
+                                                {formatExpenseDate(expense.date)} • {expense.paidBy ? <span className="text-blue-500 font-medium">Paid by {memberNames[expense.paidBy] || expense.paidBy}</span> : expense.category}
                                             </p>
                                         </div>
                                         <div className="text-right">
@@ -280,6 +308,20 @@ export default function TripDetails() {
                 title="Edit Trip"
                 buttonText="Save Changes"
             />
+            {trip && (
+                <AddMemberModal
+                    isOpen={isAddMemberModalOpen}
+                    onClose={() => setIsAddMemberModalOpen(false)}
+                    tripId={trip.id}
+                    currentMembers={trip.members}
+                    onMemberAdded={() => {
+                        // The subscription will auto-update the list, so just close the modal maybe?
+                        // Or keep it open. The component logic says "Let's keep it open", handled inside Modal?
+                        // Actually Modal calls onMemberAdded.
+                        // We can show a toast or just do nothing as the list updates live.
+                    }}
+                />
+            )}
         </div>
     );
 }

@@ -8,7 +8,7 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login, signup, googleLogin, currentUser } = useAuth()!;
+    const { login, signup, googleLogin, currentUser, error: authError } = useAuth()!;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -55,9 +55,9 @@ export default function Login() {
                 <div className="p-6">
                     <h2 className="text-lg font-medium text-gray-900 mb-4">Welcome Back</h2>
 
-                    {error && (
+                    {(error || authError) && (
                         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
-                            <p className="text-red-700">{error}</p>
+                            <p className="text-red-700">{error || authError}</p>
                         </div>
                     )}
 
