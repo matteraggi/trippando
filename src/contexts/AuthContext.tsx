@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { auth } from '../firebase';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -38,6 +38,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
         });
 
+        getRedirectResult(auth).catch((error) => {
+            console.error("Redirect auth error:", error);
+        });
+
         return unsubscribe;
     }, []);
 
@@ -47,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login: (email: string, password: string) => signInWithEmailAndPassword(auth, email, password).then(() => { }),
         signup: (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password).then(() => { }),
         logout: () => signOut(auth),
-        googleLogin: () => signInWithPopup(auth, new GoogleAuthProvider()).then(() => { })
+        googleLogin: () => signInWithRedirect(auth, new GoogleAuthProvider()).then(() => { })
     };
 
     return (
