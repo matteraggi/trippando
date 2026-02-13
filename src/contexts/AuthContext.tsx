@@ -41,6 +41,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
         });
 
+        getRedirectResult(auth)
+            .then((result) => {
+                if (window.localStorage.getItem('auth_redirect_started')) {
+                    window.localStorage.removeItem('auth_redirect_started');
+                }
+            })
+            .catch((err) => {
+                console.error("Redirect auth error:", err);
+                setError(err.message);
+                window.localStorage.removeItem('auth_redirect_started');
+            });
+
         return unsubscribe;
     }, []);
 
@@ -52,12 +64,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signup: (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password).then(() => { }),
         logout: () => signOut(auth),
         googleLogin: async () => {
-            const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Login error:", error);
-                throw error;
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+
+            if (isPWA) {
+                // PWA Context: Use Popup to keep app context alive
+                const provider = new GoogleAuthProvider();
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (error) {
+                    console.error("PWA Login error:", error);
+                    throw error;
+                }
+            } else {
+                // Browser Context: Use Redirect for better mobile web URL handling
+                window.localStorage.setItem('auth_redirect_started', 'true');
+                await signInWithRedirect(auth, new GoogleAuthProvider());
             }
         }
     };
