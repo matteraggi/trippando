@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
 
         getRedirectResult(auth)
-            .then((result) => {
+            .then(() => {
                 if (window.localStorage.getItem('auth_redirect_started')) {
                     window.localStorage.removeItem('auth_redirect_started');
                 }
