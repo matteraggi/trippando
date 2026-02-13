@@ -16,17 +16,19 @@ const App: React.FC = () => {
     <AuthProvider>
       <NicknameModal />
       <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<PrivateRoute />}>
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/trip/:tripId" element={<TripDetails />} />
-            <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
-            <Route path="/" element={<Navigate to="/home" replace />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="min-h-screen pt-safe pb-safe">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<PrivateRoute />}>
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/trip/:tripId" element={<TripDetails />} />
+              <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
       </Router>
     </AuthProvider>
 
