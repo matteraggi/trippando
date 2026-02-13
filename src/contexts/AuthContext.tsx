@@ -41,17 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
         });
 
-        getRedirectResult(auth)
-            .then(() => {
-                if (window.localStorage.getItem('auth_redirect_started')) {
-                    window.localStorage.removeItem('auth_redirect_started');
-                }
-            })
-            .catch((err) => {
-                console.error("Redirect auth error:", err);
-                setError(err.message);
-                window.localStorage.removeItem('auth_redirect_started');
-            });
+
 
         return unsubscribe;
     }, []);
