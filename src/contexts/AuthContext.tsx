@@ -53,7 +53,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login: (email: string, password: string) => signInWithEmailAndPassword(auth, email, password).then(() => { }),
         signup: (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password).then(() => { }),
         logout: () => signOut(auth),
-        googleLogin: () => signInWithPopup(auth, new GoogleAuthProvider()).then(() => { })
+        googleLogin: () => {
+            window.localStorage.setItem('auth_redirect_started', 'true');
+            return signInWithRedirect(auth, new GoogleAuthProvider());
+        }
     };
 
     return (
