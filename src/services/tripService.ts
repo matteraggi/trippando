@@ -19,7 +19,6 @@ import {
 } from 'firebase/firestore';
 import type { Trip } from '../types/Trip';
 
-// ... (existing code)
 
 export const addTripMember = async (tripId: string, userId: string) => {
     try {

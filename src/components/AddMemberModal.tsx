@@ -18,7 +18,7 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
     const [loading, setLoading] = useState(false);
     const [adding, setAdding] = useState<string | null>(null);
 
-    // Debounce search could be better, but for now simple Enter or button click
+
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!searchTerm.trim()) return;
@@ -40,8 +40,6 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
         try {
             await addTripMember(tripId, user.uid);
             onMemberAdded();
-            // Optional: Close modal or just show success state?
-            // Let's keep it open to add more people, but marks as added
         } catch (error) {
             console.error("Failed to add member", error);
             alert("Failed to add member");

@@ -10,17 +10,12 @@ export interface UserProfile {
     createdAt: Timestamp;
 }
 
-// ...
 
 export const searchUsers = async (searchTerm: string): Promise<UserProfile[]> => {
     if (!searchTerm || searchTerm.length < 2) return [];
 
     const usersRef = collection(db, 'users');
-    // Simple prefix search. Note: This is case-sensitive and limited. 
-    // Ideally use a proper search service (Algolia/Typesense) or simple normalization (lowercase fields).
-    // For now, we'll try to match exact or standard prefix.
-
-    // Create a query against the collection.
+    // migliorare ricerca
     const q = query(
         usersRef,
         where('displayName', '>=', searchTerm),
@@ -65,7 +60,6 @@ export const updateUserNickname = async (uid: string, nickname: string): Promise
 export const getUsers = async (uids: string[]): Promise<UserProfile[]> => {
     if (!uids || uids.length === 0) return [];
 
-    // Using Promise.all for simplicity. For large lists, 'in' query batches would be better.
     const promises = uids.map(uid => getUserProfile(uid));
     const results = await Promise.all(promises);
     return results.filter((u): u is UserProfile => u !== null);

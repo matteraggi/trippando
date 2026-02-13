@@ -27,7 +27,7 @@ export default function Profile() {
                     <ChevronLeft size={24} />
                 </button>
                 <h1 className="text-xl font-semibold text-gray-800">Profile</h1>
-                <div className="w-8"></div> {/* Spacer for alignment */}
+                <div className="w-8"></div>
             </div>
 
             <div className="p-4">

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { X, Calendar, CreditCard, Tag, AlignLeft, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { addExpense } from '../services/expenseService';
-import { getTrip } from '../services/tripService'; // Ensure this is imported
+import { getTrip } from '../services/tripService';
 import { getUsers, type UserProfile } from '../services/userService';
 import { EXPENSE_CATEGORIES, EXPENSE_CURRENCIES, type ExpenseCategory } from '../constants/expenseConstants';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -63,7 +63,7 @@ export default function AddExpense() {
                 currency,
                 category,
                 description,
-                paidBy, // This is now a UID (or empty string)
+                paidBy,
                 date: new Date(date),
                 tripId
             });

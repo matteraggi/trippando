@@ -41,8 +41,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setLoading(false);
         });
 
-
-
         return unsubscribe;
     }, []);
 
@@ -53,9 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login: (email: string, password: string) => signInWithEmailAndPassword(auth, email, password).then(() => { }),
         signup: (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password).then(() => { }),
         logout: () => signOut(auth),
-        googleLogin: () => {
-            window.localStorage.setItem('auth_redirect_started', 'true');
-            return signInWithRedirect(auth, new GoogleAuthProvider());
+        googleLogin: async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Login error:", error);
+                throw error;
+            }
         }
     };
 

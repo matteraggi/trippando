@@ -50,7 +50,6 @@ export default function NicknameModal() {
             // 3. Close modal
             setIsOpen(false);
 
-            // Optional: Reload to ensure all contexts update, or just rely on state
             window.location.reload();
         } catch (error) {
             console.error("Failed to save nickname:", error);

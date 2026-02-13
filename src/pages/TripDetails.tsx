@@ -36,7 +36,6 @@ export default function TripDetails() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 
-    // ... useEffect ...
 
     const handleUpdateTrip = async (data: any) => {
         if (!tripId) return;
@@ -61,9 +60,6 @@ export default function TripDetails() {
     };
 
 
-
-    // ...
-
     const [memberNames, setMemberNames] = useState<Record<string, string>>({});
 
     useEffect(() => {
@@ -73,7 +69,6 @@ export default function TripDetails() {
             setTrip(tripData);
             setLoading(false);
 
-            // Fetch member names when trip data is loaded
             if (tripData && tripData.members && tripData.members.length > 0) {
                 getUsers(tripData.members).then(users => {
                     const names: Record<string, string> = {};
@@ -123,7 +118,6 @@ export default function TripDetails() {
         );
     }
 
-    // Security check: Ensure user is a member
     if (currentUser && !trip.members.includes(currentUser.uid)) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
