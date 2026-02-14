@@ -28,7 +28,6 @@ const getCategoryIcon = (category: string) => {
 
 const ExpensesList: React.FC<ExpensesListProps> = ({
     expenses,
-    tripId,
     memberNames,
     exchangeRates,
     onAddExpense,

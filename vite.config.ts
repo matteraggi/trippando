@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'trippando_logo.png'],
       manifest: {
         name: 'Trippando',
         short_name: 'Trippando',
@@ -16,6 +16,19 @@ export default defineConfig({
         theme_color: '#ffffff',
         display: 'standalone',
         background_color: '#ffffff',
+        icons: [
+          {
+            src: 'trippando_logo.png',
+            sizes: '500x500',
+            type: 'image/png'
+          },
+          {
+            src: 'trippando_logo.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
@@ -36,6 +49,18 @@ export default defineConfig({
           }
         ]
       }
-    })
+    }),
   ],
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          'vendor-ui': ['lucide-react', 'date-fns'],
+        }
+      }
+    }
+  }
 })

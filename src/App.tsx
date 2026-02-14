@@ -1,15 +1,17 @@
-import React from 'react';
-
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
 import { AuthProvider } from './contexts/AuthContext';
-import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
-import Home from './pages/Homepage';
-import TripDetails from './pages/TripDetails';
-import AddExpense from './pages/AddExpense';
 import NicknameModal from './components/NicknameModal';
+import LoadingSpinner from './components/LoadingSpinner';
+
+// Lazy load pages
+const Login = lazy(() => import('./pages/Login'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Home = lazy(() => import('./pages/Homepage'));
+const TripDetails = lazy(() => import('./pages/TripDetails'));
+const AddExpense = lazy(() => import('./pages/AddExpense'));
 
 const App: React.FC = () => {
   return (
@@ -17,22 +19,29 @@ const App: React.FC = () => {
       <NicknameModal />
       <Router>
         <div className="min-h-screen pt-safe pb-safe">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route element={<PrivateRoute />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/trip/:tripId" element={<TripDetails />} />
-              <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
-              <Route path="/trip/:tripId/expense/:expenseId" element={<AddExpense />} />
-              <Route path="/" element={<Navigate to="/home" replace />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense
+            fallback={
+              <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
+                <LoadingSpinner size={40} color="#3B82F6" />
+              </div>
+            }
+          >
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route element={<PrivateRoute />}>
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/trip/:tripId" element={<TripDetails />} />
+                <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
+                <Route path="/trip/:tripId/expense/:expenseId" element={<AddExpense />} />
+                <Route path="/" element={<Navigate to="/home" replace />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </div>
       </Router>
     </AuthProvider>
-
   );
 };
 
