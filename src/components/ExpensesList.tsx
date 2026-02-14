@@ -42,20 +42,26 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
         return `€${totalEUR.toFixed(2)}`;
     };
 
+    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
     return (
-        <div>
+        <div className="pb-20 space-y-4">
+            {/* Total Banner - Rounded Box Style */}
             {expenses.length > 0 && (
-                <div className="bg-white px-4 py-4 border-b border-gray-100 shadow-sm sticky top-[115px] z-20 -mx-4 mb-6">
-                    <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Totale Speso</p>
-                    <p className="text-2xl font-bold text-gray-900">{calculateTotals()}</p>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                    <div>
+                        <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Totale Speso</p>
+                        <p className="text-2xl font-bold text-gray-900">{calculateTotals()}</p>
+                    </div>
+                    {/* Add button in the header if desired, or keep it separate */}
                 </div>
             )}
 
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-2 px-1">
                 <h3 className="text-lg font-semibold text-gray-900">Spese Recenti</h3>
                 <button
                     onClick={onAddExpense}
-                    className="text-blue-600 font-medium text-sm"
+                    className="text-blue-600 font-medium text-sm hover:underline"
                 >
                     + Aggiungi
                 </button>
