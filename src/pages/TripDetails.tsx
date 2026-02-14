@@ -160,7 +160,7 @@ export default function TripDetails() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="min-h-screen bg-gray-50 pb-6">
             <TripHeader
                 trip={trip}
                 onBack={() => navigate(-1)}

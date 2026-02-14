@@ -45,7 +45,7 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
     const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
     return (
-        <div className="pb-20 space-y-4">
+        <div className="space-y-4">
             {/* Total Banner - Rounded Box Style */}
             {expenses.length > 0 && (
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">

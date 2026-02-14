@@ -65,15 +65,10 @@ export default function Homepage() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             {/* Header */}
-            <header className="px-5 py-4 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10">
+            <header className="px-5 py-6 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10 transition-all">
                 <div>
-                    <button
-                        onClick={() => navigate('/profile')}
-                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-300 transition-colors mb-2"
-                    >
-                        <User size={18} />
-                    </button>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Viaggi</h1>
+                    <p className="text-gray-500 text-sm font-medium mb-1">Bentornato{currentUser?.displayName ? `, ${currentUser.displayName}` : ''}</p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">I miei Viaggi</h1>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}

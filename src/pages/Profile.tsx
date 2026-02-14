@@ -60,19 +60,10 @@ export default function Profile() {
     if (!currentUser) return null;
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
-            {/* Header */}
-            <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200 px-4 pt-4 pb-2">
-                <div className="flex justify-between items-center">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="flex items-center text-blue-500 font-medium -ml-2"
-                    >
-                        <ChevronLeft size={24} />
-                        Indietro
-                    </button>
-                    <h1 className="text-lg font-semibold text-gray-900">Profilo</h1>
-                    <div className="w-8"></div>
+        <div className="min-h-screen bg-gray-50 pb-24">
+            <header className="px-5 py-6 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Profilo</h1>
                 </div>
             </header>
 

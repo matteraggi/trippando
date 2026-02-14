@@ -12,6 +12,8 @@ const Profile = lazy(() => import('./pages/Profile'));
 const Home = lazy(() => import('./pages/Homepage'));
 const TripDetails = lazy(() => import('./pages/TripDetails'));
 const AddExpense = lazy(() => import('./pages/AddExpense'));
+const Restaurants = lazy(() => import('./pages/Restaurants'));
+import Layout from './components/Layout';
 
 const App: React.FC = () => {
   return (
@@ -29,8 +31,14 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route element={<PrivateRoute />}>
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/home" element={<Home />} />
+                {/* Main Tab Routes with Bottom Navigation */}
+                <Route element={<Layout />}>
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/restaurants" element={<Restaurants />} />
+                  <Route path="/profile" element={<Profile />} />
+                </Route>
+
+                {/* Sub-pages without Bottom Navigation */}
                 <Route path="/trip/:tripId" element={<TripDetails />} />
                 <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
                 <Route path="/trip/:tripId/expense/:expenseId" element={<AddExpense />} />
