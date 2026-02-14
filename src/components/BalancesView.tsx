@@ -189,7 +189,7 @@ const BalancesView: React.FC<BalancesViewProps> = ({
                     <div className="flex flex-col items-center">
                         <div className="relative w-48 h-48 mb-6">
                             <svg viewBox="-1 -1 2 2" style={{ transform: 'rotate(-90deg)' }} className="w-full h-full">
-                                {categoryData.map((cat, index) => {
+                                {categoryData.map((cat) => {
                                     // Calculate slice
                                     const startPercent = cumulativePercent;
                                     const slicePercent = cat.percentage / 100;
