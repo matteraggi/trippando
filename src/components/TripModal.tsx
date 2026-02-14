@@ -84,20 +84,20 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Destination Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Destinazione</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 outline-none text-lg font-medium"
-                            placeholder="e.g. Paris"
+                            placeholder="es. Parigi"
                             required
                         />
                     </div>
 
                     {/* Icon Picker */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Icona</label>
                         <div className="grid grid-cols-8 gap-2">
                             {TRIP_ICONS.map(item => {
                                 const Icon = item.icon;
@@ -118,7 +118,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
 
                     {/* Color Picker */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Colore</label>
                         <div className="flex space-x-3 overflow-x-auto pb-4 pt-2 -mx-2 px-2 no-scrollbar">
                             {TRIP_COLORS.map(color => (
                                 <button
@@ -133,7 +133,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Data Inizio</label>
                             <input
                                 type="date"
                                 value={startDate}
@@ -143,7 +143,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Data Fine</label>
                             <input
                                 type="date"
                                 value={endDate}

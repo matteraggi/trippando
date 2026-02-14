@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Search, User, UserPlus, Check } from 'lucide-react';
 import { searchUsers, type UserProfile } from '../services/userService';
 import { addTripMember } from '../services/tripService';
@@ -18,21 +18,27 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
     const [loading, setLoading] = useState(false);
     const [adding, setAdding] = useState<string | null>(null);
 
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (searchTerm.trim().length === 0) {
+                setResults([]);
+                return;
+            }
 
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!searchTerm.trim()) return;
+            setLoading(true);
+            try {
+                const users = await searchUsers(searchTerm.trim());
+                setResults(users);
+            } catch (error) {
+                console.error("Search failed", error);
+            } finally {
+                setLoading(false);
+            }
+        }, 300); // 300ms delay
 
-        setLoading(true);
-        try {
-            const users = await searchUsers(searchTerm.trim());
-            setResults(users);
-        } catch (error) {
-            console.error("Search failed", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     const handleAddUser = async (user: UserProfile) => {
         if (adding) return;
@@ -57,7 +63,7 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
 
                 {/* Header */}
                 <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
-                    <h3 className="font-semibold text-gray-900">Add Members</h3>
+                    <h3 className="font-semibold text-gray-900">Aggiungi Membro</h3>
                     <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full text-gray-500">
                         <X size={20} />
                     </button>
@@ -65,23 +71,17 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
 
                 {/* Search */}
                 <div className="p-4 bg-gray-50/50">
-                    <form onSubmit={handleSearch} className="relative">
+                    <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
                             type="text"
-                            placeholder="Search by nickname..."
+                            placeholder="Cerca per nickname..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
                             autoFocus
                         />
-                        <button
-                            type="submit"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors"
-                        >
-                            Search
-                        </button>
-                    </form>
+                    </div>
                 </div>
 
                 {/* Results */}
@@ -108,7 +108,7 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
 
                                         {isMember ? (
                                             <button disabled className="px-3 py-1.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-semibold flex items-center cursor-default">
-                                                <Check size={14} className="mr-1" /> Added
+                                                <Check size={14} className="mr-1" /> Aggiunto
                                             </button>
                                         ) : (
                                             <button
@@ -120,7 +120,7 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
                                                     <LoadingSpinner size={14} color="#2563EB" />
                                                 ) : (
                                                     <>
-                                                        <UserPlus size={14} className="mr-1" /> Add
+                                                        <UserPlus size={14} className="mr-1" /> Aggiungi
                                                     </>
                                                 )}
                                             </button>
@@ -131,13 +131,13 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
                         </div>
                     ) : searchTerm && !loading ? (
                         <div className="text-center py-8 text-gray-400 text-sm">
-                            <p>No users found matching "{searchTerm}"</p>
-                            <p className="text-xs mt-1">Try a different nickname.</p>
+                            <p>Nessun utente trovato per "{searchTerm}"</p>
+                            <p className="text-xs mt-1">Prova un nickname diverso.</p>
                         </div>
                     ) : (
                         <div className="text-center py-12 text-gray-300">
                             <User size={48} className="mx-auto mb-2 opacity-20" />
-                            <p className="text-sm">Search for friends to add them to the trip.</p>
+                            <p className="text-sm">Scrivi per cercare utenti.</p>
                         </div>
                     )}
                 </div>

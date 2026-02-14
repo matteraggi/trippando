@@ -8,7 +8,11 @@ import {
     query,
     where,
     orderBy,
-    onSnapshot
+    onSnapshot,
+    doc,
+    getDoc,
+    updateDoc,
+    deleteDoc
 } from 'firebase/firestore';
 
 const EXPENSES_COLLECTION = 'expenses';
@@ -32,6 +36,48 @@ export const addExpense = async (expenseData: CreateExpenseData) => {
         });
     } catch (error) {
         console.error("Error adding expense:", error);
+        throw error;
+    }
+};
+
+export const getExpense = async (expenseId: string): Promise<Expense | null> => {
+    try {
+        const docRef = doc(db, EXPENSES_COLLECTION, expenseId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as Expense;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error getting expense:", error);
+        throw error;
+    }
+};
+
+export const updateExpense = async (expenseId: string, expenseData: Partial<CreateExpenseData>) => {
+    try {
+        const docRef = doc(db, EXPENSES_COLLECTION, expenseId);
+        const updateData: any = { ...expenseData };
+        if (expenseData.date) {
+            updateData.date = Timestamp.fromDate(expenseData.date);
+        }
+        // Always update timestamp
+        updateData.updatedAt = serverTimestamp();
+
+        await updateDoc(docRef, updateData);
+    } catch (error) {
+        console.error("Error updating expense:", error);
+        throw error;
+    }
+};
+
+export const deleteExpense = async (expenseId: string) => {
+    try {
+        const docRef = doc(db, EXPENSES_COLLECTION, expenseId);
+        await deleteDoc(docRef);
+    } catch (error) {
+        console.error("Error deleting expense:", error);
         throw error;
     }
 };

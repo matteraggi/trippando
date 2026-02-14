@@ -11,9 +11,13 @@ import type { Expense } from '../types/Expense';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { TRIP_ICONS } from '../constants/tripConstants';
+import { CATEGORY_LABELS } from '../constants/expenseConstants';
 import TripModal from '../components/TripModal';
 import AddMemberModal from '../components/AddMemberModal';
+import NoteModal from '../components/NoteModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { subscribeToNotes, addNote, updateNote, deleteNote } from '../services/noteService';
+import type { Note } from '../types/Note';
 
 const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -36,8 +40,13 @@ export default function TripDetails() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+    const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'expenses' | 'balances' | 'notes'>('expenses');
     const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
+
+    // Notes State
+    const [notes, setNotes] = useState<Note[]>([]);
+    const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
     useEffect(() => {
         getExchangeRates('EUR').then(rates => setExchangeRates(rates));
@@ -56,8 +65,36 @@ export default function TripDetails() {
         }
     };
 
+    const handleSaveNote = async (noteData: { title: string; content: string }) => {
+        if (!tripId || !currentUser) return;
+        try {
+            if (selectedNote) {
+                await updateNote(tripId, selectedNote.id, noteData);
+            } else {
+                await addNote(tripId, { ...noteData, createdBy: currentUser.uid });
+            }
+            setIsNoteModalOpen(false);
+            setSelectedNote(null);
+        } catch (error) {
+            console.error("Failed to save note", error);
+            alert("Failed to save note");
+        }
+    };
+
+    const handleDeleteNote = async (noteId: string) => {
+        if (!tripId || !window.confirm("Sei sicuro di voler eliminare questa nota?")) return;
+        try {
+            await deleteNote(tripId, noteId);
+        } catch (error) {
+            console.error("Failed to delete note", error);
+            alert("Failed to delete note");
+        }
+    };
+
+
+
     const handleDeleteTrip = async () => {
-        if (!tripId || !window.confirm("Are you sure you want to delete this trip? All expenses will be deleted.")) return;
+        if (!tripId || !window.confirm("Sei sicuro di voler eliminare questo viaggio? Tutte le spese verranno perse.")) return;
         try {
             await deleteTrip(tripId);
             navigate('/');
@@ -90,9 +127,14 @@ export default function TripDetails() {
             setExpenses(expenseList);
         });
 
+        const unsubscribeNotes = subscribeToNotes(tripId, (notesList) => {
+            setNotes(notesList);
+        });
+
         return () => {
             unsubscribeTrip();
             unsubscribeExpenses();
+            unsubscribeNotes();
         };
     }, [tripId]);
 
@@ -116,12 +158,12 @@ export default function TripDetails() {
     if (!trip) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Trip not found</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Viaggio non trovato</h2>
                 <button
                     onClick={() => navigate('/')}
                     className="text-blue-500 hover:underline"
                 >
-                    Go back home
+                    Torna alla home
                 </button>
             </div>
         );
@@ -130,9 +172,9 @@ export default function TripDetails() {
     if (currentUser && !trip.members.includes(currentUser.uid)) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-                <h2 className="text-xl font-bold text-red-600 mb-2">Access Denied</h2>
-                <p className="text-gray-600">You are not a member of this trip.</p>
-                <button onClick={() => navigate('/')} className="mt-4 text-blue-500">Go Back</button>
+                <h2 className="text-xl font-bold text-red-600 mb-2">Accesso Negato</h2>
+                <p className="text-gray-600">Non sei un membro di questo viaggio.</p>
+                <button onClick={() => navigate('/')} className="mt-4 text-blue-500">Torna Indietro</button>
             </div>
         )
     }
@@ -217,7 +259,7 @@ export default function TripDetails() {
                         className="flex items-center text-blue-500 font-medium -ml-2"
                     >
                         <ChevronLeft size={24} />
-                        Back
+                        Indietro
                     </button>
                     <h1 className="text-lg font-semibold text-gray-900 truncate max-w-[60%]">
                         {trip.name}
@@ -242,7 +284,7 @@ export default function TripDetails() {
                                         className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center"
                                     >
                                         <div className="w-8 flex justify-center"><LucideIcons.UserPlus size={16} /></div>
-                                        Add Member
+                                        Aggiungi Membro
                                     </button>
                                     <button
                                         onClick={() => {
@@ -252,14 +294,14 @@ export default function TripDetails() {
                                         className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center"
                                     >
                                         <div className="w-8 flex justify-center"><LucideIcons.Edit2 size={16} /></div>
-                                        Edit Trip
+                                        Modifica Viaggio
                                     </button>
                                     <button
                                         onClick={handleDeleteTrip}
                                         className="w-full text-left px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center"
                                     >
                                         <div className="w-8 flex justify-center"><LucideIcons.Trash2 size={16} /></div>
-                                        Delete Trip
+                                        Elimina Viaggio
                                     </button>
                                 </div>
                             </>
@@ -281,7 +323,7 @@ export default function TripDetails() {
                                     return <IconComponent size={24} className="text-white" />;
                                 })()}
                             </div>
-                            <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 backdrop-blur-sm px-2 py-1 rounded">Trip</span>
+                            <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 backdrop-blur-sm px-2 py-1 rounded">Viaggio</span>
                         </div>
                         <h2 className="text-3xl font-bold leading-tight mb-2">{trip.name}</h2>
                         <p className="text-sm font-medium opacity-90 flex items-center">
@@ -304,7 +346,7 @@ export default function TripDetails() {
                                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                 }`}
                         >
-                            {tab}
+                            {tab === 'expenses' ? 'Spese' : tab === 'balances' ? 'Bilancio' : 'Note'}
                         </button>
                     ))}
                 </div>
@@ -313,7 +355,7 @@ export default function TripDetails() {
             {/* Totals Banner (Only for Expenses) */}
             {activeTab === 'expenses' && expenses.length > 0 && (
                 <div className="bg-white px-4 py-4 border-b border-gray-100 shadow-sm sticky top-[115px] z-20">
-                    <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Total Spent</p>
+                    <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Totale Speso</p>
                     <p className="text-2xl font-bold text-gray-900">{calculateTotals()}</p>
                 </div>
             )}
@@ -325,12 +367,12 @@ export default function TripDetails() {
                 {activeTab === 'expenses' && (
                     <div>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">Recent Expenses</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Spese Recenti</h3>
                             <button
                                 onClick={() => navigate(`/trip/${tripId}/add-expense`)}
                                 className="text-blue-600 font-medium text-sm"
                             >
-                                + Add
+                                + Aggiungi
                             </button>
                         </div>
 
@@ -339,19 +381,23 @@ export default function TripDetails() {
                                 <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <Tag className="text-gray-400" />
                                 </div>
-                                <p className="text-gray-500 text-sm mb-4">No expenses recorded yet.</p>
+                                <p className="text-gray-500 text-sm mb-4">Nessuna spesa registrata.</p>
                                 <button
                                     onClick={() => navigate(`/trip/${tripId}/add-expense`)}
                                     className="px-5 py-2.5 bg-blue-500 text-white rounded-xl font-medium text-sm hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
                                 >
-                                    Add First Expense
+                                    Aggiungi Prima Spesa
                                 </button>
                             </div>
                         ) : (
                             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div className="divide-y divide-gray-50">
                                     {expenses.map(expense => (
-                                        <div key={expense.id} className="flex items-center p-4 hover:bg-gray-50 transition-colors">
+                                        <div
+                                            key={expense.id}
+                                            onClick={() => navigate(`/trip/${tripId}/expense/${expense.id}`)}
+                                            className="flex items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100"
+                                        >
                                             <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${expense.category === 'Food' ? 'bg-orange-100 text-orange-600' :
                                                 expense.category === 'Transport' ? 'bg-blue-100 text-blue-600' :
                                                     expense.category === 'Hotel' ? 'bg-purple-100 text-purple-600' :
@@ -360,9 +406,9 @@ export default function TripDetails() {
                                                 {getCategoryIcon(expense.category)}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-gray-900 font-medium truncate">{expense.description || expense.category}</p>
+                                                <p className="text-gray-900 font-medium truncate">{expense.description || CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category}</p>
                                                 <p className="text-xs text-gray-500 truncate">
-                                                    {formatExpenseDate(expense.date)} • {expense.paidBy ? <span className="text-blue-500 font-medium">Paid by {memberNames[expense.paidBy] || expense.paidBy}</span> : expense.category}
+                                                    {formatExpenseDate(expense.date)} • {expense.paidBy ? <span className="text-blue-500 font-medium">{memberNames[expense.paidBy] ? `${memberNames[expense.paidBy]}` : expense.paidBy}</span> : (CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category)}
                                                 </p>
                                             </div>
                                             <div className="text-right">
@@ -375,6 +421,7 @@ export default function TripDetails() {
                                                     </p>
                                                 )}
                                             </div>
+                                            <LucideIcons.ChevronRight size={16} className="text-gray-300 ml-2" />
                                         </div>
                                     ))}
                                 </div>
@@ -387,7 +434,7 @@ export default function TripDetails() {
                 {activeTab === 'balances' && (
                     <div className="space-y-6">
                         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Balances</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Bilancio</h3>
                             <div className="space-y-4">
                                 {calculateBalances().map(member => (
                                     <div key={member.uid} className="flex items-center justify-between">
@@ -397,7 +444,7 @@ export default function TripDetails() {
                                             </div>
                                             <div>
                                                 <p className="font-medium text-gray-900">{member.name}</p>
-                                                <p className="text-xs text-gray-500">Paid: €{member.paid.toFixed(2)}</p>
+                                                <p className="text-xs text-gray-500">Pagato: €{member.paid.toFixed(2)}</p>
                                             </div>
                                         </div>
                                         <div className={`text-right font-bold ${member.balance >= 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -408,22 +455,38 @@ export default function TripDetails() {
                             </div>
                         </div>
 
-                        {/* Settlement Plan (Simple Version) */}
+                        {/* Settlement Plan (Improved UI) */}
                         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Settlements</h3>
-                            <p className="text-gray-500 text-sm mb-3">Suggested payments to settle debts.</p>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pareggio Debiti</h3>
+                            <p className="text-gray-500 text-sm mb-3">Suggerimenti per saldare i debiti.</p>
                             <div className="space-y-3">
                                 {calculateSettlements().length === 0 ? (
-                                    <p className="text-gray-500 text-sm">No settlements needed.</p>
+                                    <p className="text-gray-500 text-sm">Nessun pareggio necessario.</p>
                                 ) : (
                                     calculateSettlements().map((settlement, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                            <div className="flex items-center space-x-2">
-                                                <span className="font-medium text-gray-900">{settlement.from}</span>
-                                                <LucideIcons.ArrowRight size={16} className="text-gray-400" />
-                                                <span className="font-medium text-gray-900">{settlement.to}</span>
+                                        <div key={idx} className="flex flex-col p-4 bg-gray-50 rounded-xl border border-gray-100 relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-bl-full -mr-8 -mt-8"></div>
+
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Deve dare</span>
+                                                    <span className="font-bold text-gray-900 text-base">{settlement.from}</span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="block text-lg font-bold text-blue-600">€{settlement.amount.toFixed(2)}</span>
+                                                </div>
                                             </div>
-                                            <span className="font-bold text-gray-900">€{settlement.amount.toFixed(2)}</span>
+
+                                            <div className="flex items-center text-gray-400 my-1">
+                                                <div className="h-px bg-gray-200 flex-1"></div>
+                                                <LucideIcons.ArrowDown size={14} className="mx-2" />
+                                                <div className="h-px bg-gray-200 flex-1"></div>
+                                            </div>
+
+                                            <div className="flex flex-col mt-2">
+                                                <span className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">A favore di</span>
+                                                <span className="font-bold text-gray-900 text-base">{settlement.to}</span>
+                                            </div>
                                         </div>
                                     ))
                                 )}
@@ -434,19 +497,87 @@ export default function TripDetails() {
 
                 {/* Notes Tab */}
                 {activeTab === 'notes' && (
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">Trip Notes</h3>
-                        <p className="text-gray-500 text-sm whitespace-pre-wrap">{trip.description || "No notes added."}</p>
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center mb-2 px-1">
+                            <h3 className="text-lg font-semibold text-gray-900">Note di viaggio</h3>
+                            <button
+                                onClick={() => {
+                                    setSelectedNote(null);
+                                    setIsNoteModalOpen(true);
+                                }}
+                                className="text-blue-600 font-medium text-sm flex items-center"
+                            >
+                                <LucideIcons.Plus size={18} className="mr-1" />
+                                Nuova Nota
+                            </button>
+                        </div>
+
+                        {notes.length === 0 ? (
+                            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center">
+                                <LucideIcons.FileText size={48} className="mx-auto mb-3 text-gray-300" />
+                                <p className="text-gray-500 text-sm mb-4">Nessuna nota presente.</p>
+                                <button
+                                    onClick={() => {
+                                        setSelectedNote(null);
+                                        setIsNoteModalOpen(true);
+                                    }}
+                                    className="px-5 py-2.5 bg-blue-500 text-white rounded-xl font-medium text-sm hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
+                                >
+                                    Aggiungi la prima nota
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4">
+                                {notes.map(note => (
+                                    <div key={note.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative group">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h4 className="font-bold text-gray-900 text-lg">{note.title || 'Senza Titolo'}</h4>
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedNote(note);
+                                                        setIsNoteModalOpen(true);
+                                                    }}
+                                                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                >
+                                                    <LucideIcons.Edit2 size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteNote(note.id)}
+                                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                >
+                                                    <LucideIcons.Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p className="text-gray-600 text-sm whitespace-pre-wrap leading-relaxed line-clamp-3">{note.content}</p>
+                                        <div className="mt-3 pt-3 border-t border-gray-50 text-xs text-gray-400 flex justify-between">
+                                            <span>{formatDate(note.updatedAt)}</span>
+                                            {memberNames[note.createdBy] && (
+                                                <span>Di {memberNames[note.createdBy]}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
+            <NoteModal
+                isOpen={isNoteModalOpen}
+                onClose={() => setIsNoteModalOpen(false)}
+                onSubmit={handleSaveNote}
+                initialData={selectedNote}
+                title={selectedNote ? "Modifica Nota" : "Nuova Nota"}
+            />
             <TripModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
                 onSubmit={handleUpdateTrip}
                 initialData={trip}
-                title="Edit Trip"
-                buttonText="Save Changes"
+                title="Modifica Viaggio"
+                buttonText="Salva Modifiche"
             />
             {trip && (
                 <AddMemberModal

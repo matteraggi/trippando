@@ -73,7 +73,7 @@ export default function Homepage() {
                     >
                         <User size={18} />
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Trips</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Viaggi</h1>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
@@ -90,8 +90,8 @@ export default function Homepage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                         type="text"
-                        placeholder="Search trips..."
-                        className="w-full bg-gray-200/50 pl-10 pr-4 py-2.5 rounded-xl border-none outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm font-medium"
+                        placeholder="Cerca viaggi..."
+                        className="w-full bg-gray-200/50 pl-10 pr-4 py-2.5 pt-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500/50 transition-all text-sm font-medium"
                     />
                 </div>
 
@@ -125,8 +125,8 @@ export default function Homepage() {
                         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
                             <MapPin size={32} />
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No trips yet</h3>
-                        <p className="text-gray-500 text-sm px-10">Create your first trip to start tracking expenses.</p>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Nessun viaggio</h3>
+                        <p className="text-gray-500 text-sm px-10">Crea il tuo primo viaggio per tracciare le spese.</p>
                     </div>
                 )}
             </main>
@@ -135,8 +135,8 @@ export default function Homepage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleCreateTrip}
-                title="New Trip"
-                buttonText="Create Trip"
+                title="Nuovo Viaggio"
+                buttonText="Crea Viaggio"
             />
         </div>
     );

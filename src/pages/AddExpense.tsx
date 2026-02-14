@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, Calendar, CreditCard, Tag, AlignLeft, User } from 'lucide-react';
+import { X, Calendar, CreditCard, Tag, AlignLeft, User, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { addExpense } from '../services/expenseService';
+import { addExpense, getExpense, updateExpense, deleteExpense } from '../services/expenseService';
 import { getTrip } from '../services/tripService';
 import { getUsers, type UserProfile } from '../services/userService';
-import { EXPENSE_CATEGORIES, EXPENSE_CURRENCIES, type ExpenseCategory } from '../constants/expenseConstants';
+import { EXPENSE_CATEGORIES, EXPENSE_CURRENCIES, type ExpenseCategory, CATEGORY_LABELS } from '../constants/expenseConstants';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function AddExpense() {
-    const { tripId } = useParams<{ tripId: string }>();
+    const { tripId, expenseId } = useParams<{ tripId: string; expenseId?: string }>();
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const isEditMode = !!expenseId;
 
     const [amount, setAmount] = useState('');
     const [currency, setCurrency] = useState('EUR');
@@ -22,33 +23,58 @@ export default function AddExpense() {
 
     const [members, setMembers] = useState<UserProfile[]>([]);
     const [loadingMembers, setLoadingMembers] = useState(true);
+    const [loadingExpense, setLoadingExpense] = useState(false);
 
-    // Load trip members
+    // Load trip members and expense data
     useEffect(() => {
         if (!tripId) return;
 
         const loadData = async () => {
             try {
+                // 1. Load Trip Members
                 const trip = await getTrip(tripId);
                 if (trip && trip.members && trip.members.length > 0) {
                     const profiles = await getUsers(trip.members);
                     setMembers(profiles);
 
-                    // Default to current user if they are a member
-                    if (currentUser && trip.members.includes(currentUser.uid)) {
-                        setPaidBy(currentUser.uid);
-                    } else if (profiles.length > 0) {
-                        setPaidBy(profiles[0].uid);
+                    // Default paidBy logic (only if not editing or not yet set)
+                    if (!isEditMode && !paidBy) {
+                        if (currentUser && trip.members.includes(currentUser.uid)) {
+                            setPaidBy(currentUser.uid);
+                        } else if (profiles.length > 0) {
+                            setPaidBy(profiles[0].uid);
+                        }
                     }
                 }
+
+                // 2. Load Expense if in Edit Mode
+                if (isEditMode && expenseId) {
+                    setLoadingExpense(true);
+                    const expense = await getExpense(expenseId);
+                    if (expense) {
+                        setAmount(expense.amount.toString());
+                        setCurrency(expense.currency);
+                        setCategory(expense.category as ExpenseCategory);
+                        setDescription(expense.description);
+                        setPaidBy(expense.paidBy);
+                        // Handle date conversion safely
+                        const d = expense.date instanceof Date ? expense.date : (expense.date as any).toDate();
+                        setDate(d.toISOString().split('T')[0]);
+                    } else {
+                        alert("Spesa non trovata");
+                        navigate(-1);
+                    }
+                }
+
             } catch (error) {
-                console.error("Failed to load members", error);
+                console.error("Failed to load data", error);
             } finally {
                 setLoadingMembers(false);
+                setLoadingExpense(false);
             }
         };
         loadData();
-    }, [tripId, currentUser]);
+    }, [tripId, expenseId, currentUser, isEditMode]); // Added dependencies, be careful with loops
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -58,7 +84,7 @@ export default function AddExpense() {
 
         setIsSubmitting(true);
         try {
-            await addExpense({
+            const expenseData = {
                 amount: parseFloat(amount),
                 currency,
                 category,
@@ -66,14 +92,41 @@ export default function AddExpense() {
                 paidBy,
                 date: new Date(date),
                 tripId
-            });
-            navigate(-1); // Go back
+            };
+
+            if (isEditMode && expenseId) {
+                await updateExpense(expenseId, expenseData);
+            } else {
+                await addExpense(expenseData);
+            }
+            navigate(-1);
         } catch (error) {
-            console.error("Failed to add expense", error);
-            alert("Failed to add expense");
+            console.error("Failed to save expense", error);
+            alert("Failed to save expense");
             setIsSubmitting(false);
         }
     };
+
+    const handleDelete = async () => {
+        if (!expenseId || !window.confirm("Sei sicuro di voler eliminare questa spesa?")) return;
+        setIsSubmitting(true); // Reuse submitting state
+        try {
+            await deleteExpense(expenseId);
+            navigate(-1);
+        } catch (error) {
+            console.error("Failed to delete expense", error);
+            alert("Failed to delete expense");
+            setIsSubmitting(false);
+        }
+    }
+
+    if (loadingExpense) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <LoadingSpinner size={32} color="#3B82F6" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -85,13 +138,13 @@ export default function AddExpense() {
                 >
                     <X size={24} />
                 </button>
-                <h1 className="text-lg font-semibold text-gray-900">New Expense</h1>
+                <h1 className="text-lg font-semibold text-gray-900">{isEditMode ? 'Modifica Spesa' : 'Nuova Spesa'}</h1>
                 <button
                     onClick={handleSubmit}
                     disabled={!amount || isSubmitting}
                     className={`text-blue-600 font-semibold px-2 py-1 rounded hover:bg-blue-50 transition-colors ${(!amount || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''} flex items-center`}
                 >
-                    {isSubmitting ? <LoadingSpinner size={16} color="#2563EB" /> : 'Save'}
+                    {isSubmitting ? <LoadingSpinner size={16} color="#2563EB" /> : 'Salva'}
                 </button>
             </header>
 
@@ -108,7 +161,7 @@ export default function AddExpense() {
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             className="text-6xl font-bold text-gray-900 bg-transparent outline-none w-full text-center max-w-[200px] placeholder-gray-200"
-                            autoFocus
+                            autoFocus={!isEditMode}
                         />
                     </div>
                 </div>
@@ -120,7 +173,7 @@ export default function AddExpense() {
                     <div className="flex items-center p-4 border-b border-gray-50">
                         <User className="text-gray-400 mr-3" size={20} />
                         <div className="flex-1">
-                            <label className="text-xs text-gray-400 font-medium block mb-1">Paid by</label>
+                            <label className="text-xs text-gray-400 font-medium block mb-1">Pagato da</label>
                             {loadingMembers ? (
                                 <div className="h-6 bg-gray-100 rounded animate-pulse w-32"></div>
                             ) : (
@@ -137,9 +190,9 @@ export default function AddExpense() {
                                         >
                                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${paidBy === currentUser.uid ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
                                                 }`}>
-                                                Me
+                                                Io
                                             </div>
-                                            <span className="text-sm font-medium">Me</span>
+                                            <span className="text-sm font-medium">Io</span>
                                         </button>
                                     )}
 
@@ -188,7 +241,7 @@ export default function AddExpense() {
                     <div className="p-4 border-b border-gray-50">
                         <div className="flex items-center mb-3">
                             <Tag className="text-gray-400 mr-3" size={20} />
-                            <span className="text-gray-900 font-medium">Category</span>
+                            <span className="text-gray-900 font-medium">Categoria</span>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                             {EXPENSE_CATEGORIES.map(cat => (
@@ -197,7 +250,7 @@ export default function AddExpense() {
                                     onClick={() => setCategory(cat)}
                                     className={`py-2 px-1 rounded-lg text-xs font-medium transition-colors border ${category === cat ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
                                 >
-                                    {cat}
+                                    {CATEGORY_LABELS[cat]}
                                 </button>
                             ))}
                         </div>
@@ -208,7 +261,7 @@ export default function AddExpense() {
                         <AlignLeft className="text-gray-400 mr-3" size={20} />
                         <input
                             type="text"
-                            placeholder="Description (optional)"
+                            placeholder="Descrizione (opzionale)"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             className="flex-1 outline-none text-gray-900 placeholder-gray-400"
@@ -227,6 +280,18 @@ export default function AddExpense() {
                     </div>
 
                 </div>
+
+                {/* Delete Button (Only in Edit Mode) */}
+                {isEditMode && (
+                    <button
+                        onClick={handleDelete}
+                        className="w-full py-3 text-red-600 bg-white rounded-xl shadow-sm border border-gray-100 font-medium flex items-center justify-center hover:bg-red-50 transition-colors"
+                    >
+                        <Trash2 size={20} className="mr-2" />
+                        Elimina Spesa
+                    </button>
+                )}
+
             </main>
         </div>
     );

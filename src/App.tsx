@@ -24,6 +24,7 @@ const App: React.FC = () => {
               <Route path="/home" element={<Home />} />
               <Route path="/trip/:tripId" element={<TripDetails />} />
               <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
+              <Route path="/trip/:tripId/expense/:expenseId" element={<AddExpense />} />
               <Route path="/" element={<Navigate to="/home" replace />} />
             </Route>
             <Route path="*" element={<NotFound />} />

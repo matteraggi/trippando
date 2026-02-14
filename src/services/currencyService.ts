@@ -38,31 +38,14 @@ export const getExchangeRates = async (base: string = 'EUR'): Promise<Record<str
 
 export const convertCurrency = (amount: number, fromCurrency: string, toCurrency: string, rates: Record<string, number>): number => {
     if (fromCurrency === toCurrency) return amount;
-
-    // If we don't have rates, return amount as fallback (or 0?)
-    // Warning: strictly incorrect but prevents UI crashes.
     if (!rates || Object.keys(rates).length === 0) return amount;
-
-    // Frankfurter "latest" endpoint with ?from=EUR gives rates relative to EUR.
-    // So rates['USD'] is how many USD you get for 1 EUR.
-    // To convert USD to EUR: Amount / Rate
-
-    // If base is EUR:
-    // 1 EUR = 1.05 USD (Rate)
-    // 10 USD = 10 / 1.05 EUR
-
-    // If we requested ?from=EUR, then rates are "Value of 1 EUR in X".
-    // So to convert FROM X TO EUR, we divde by rates[X].
 
     if (toCurrency === 'EUR') {
         const rate = rates[fromCurrency];
-        if (!rate) return amount; // Fallback
+        if (!rate) return amount;
         return amount / rate;
     }
 
-    // General conversion (not strictly needed for this task but good to have)
-    // Convert to Base (EUR) first, then to Target
-    // X -> EUR -> Y
     const rateFrom = rates[fromCurrency];
     const rateTo = rates[toCurrency];
 

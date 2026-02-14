@@ -65,8 +65,8 @@ export default function NicknameModal() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-in zoom-in-95 duration-300">
                 <div className="text-center mb-6">
-                    <h2 className="text-xl font-bold text-gray-900">Welcome to Trippando! 👋</h2>
-                    <p className="text-gray-500 text-sm mt-2">Please choose a nickname to continue.</p>
+                    <h2 className="text-xl font-bold text-gray-900">Benvenuto su Trippando! 👋</h2>
+                    <p className="text-gray-500 text-sm mt-2">Scegli un nickname per continuare.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,7 +78,7 @@ export default function NicknameModal() {
                             type="text"
                             value={nickname}
                             onChange={(e) => setNickname(e.target.value)}
-                            placeholder="e.g. Maverick"
+                            placeholder="es. Maverick"
                             className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-100 focus:border-blue-500 focus:bg-white outline-none transition-all font-medium text-gray-900"
                             autoFocus
                             required
@@ -91,7 +91,7 @@ export default function NicknameModal() {
                         disabled={loading || !nickname.trim()}
                         className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
-                        {loading ? <LoadingSpinner size={20} color="#ffffff" /> : "Get Started"}
+                        {loading ? <LoadingSpinner size={20} color="#ffffff" /> : "Inizia"}
                     </button>
                 </form>
             </div>

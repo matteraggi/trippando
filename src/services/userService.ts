@@ -12,19 +12,45 @@ export interface UserProfile {
 
 
 export const searchUsers = async (searchTerm: string): Promise<UserProfile[]> => {
-    if (!searchTerm || searchTerm.length < 2) return [];
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return [];
 
+    // Fetch a broader set of users for client-side filtering. 
+    // Optimization: In a real app, this should be paginated or use a dedicated search service (Algolia/Elastic).
+    // For now, fetching recent 100 users is a reasonable compromise for this scale.
     const usersRef = collection(db, 'users');
-    // migliorare ricerca
-    const q = query(
-        usersRef,
-        where('displayName', '>=', searchTerm),
-        where('displayName', '<=', searchTerm + '\uf8ff'),
-        limit(5)
-    );
+    const q = query(usersRef, limit(100)); // Fetches "all" or up to 100 users
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => doc.data() as UserProfile);
+    const allUsers = querySnapshot.docs.map(doc => doc.data() as UserProfile);
+
+    // Client-side Filter & Sort
+    const filtered = allUsers.filter(user => {
+        const name = user.displayName.toLowerCase();
+        return name.includes(term); // Fuzzy: just needs to contain the string
+    });
+
+    // Sort by relevance:
+    // 1. Exact match
+    // 2. Starts with
+    // 3. Contains
+    return filtered.sort((a, b) => {
+        const nameA = a.displayName.toLowerCase();
+        const nameB = b.displayName.toLowerCase();
+
+        // Exact match priority
+        if (nameA === term && nameB !== term) return -1;
+        if (nameB === term && nameA !== term) return 1;
+
+        // "Starts with" priority
+        const startsA = nameA.startsWith(term);
+        const startsB = nameB.startsWith(term);
+        if (startsA && !startsB) return -1;
+        if (startsB && !startsA) return 1;
+
+        // Alphabetical fallback
+        return nameA.localeCompare(nameB);
+    });
 };
 
 export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
