@@ -11,4 +11,5 @@ export interface Trip {
     createdAt: Timestamp;
     updatedAt: Timestamp;
     members: string[]; // Array of user UIDs
+    description?: string;
 }

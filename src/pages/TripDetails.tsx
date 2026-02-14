@@ -4,6 +4,7 @@ import { ChevronLeft, Calendar, MapPin, MoreHorizontal, ShoppingBag, Coffee, Car
 import * as LucideIcons from 'lucide-react';
 import { subscribeToTrip, updateTrip, deleteTrip } from '../services/tripService';
 import { subscribeToExpenses } from '../services/expenseService';
+import { getExchangeRates, convertCurrency } from '../services/currencyService';
 import { getUsers } from '../services/userService';
 import type { Trip } from '../types/Trip';
 import type { Expense } from '../types/Expense';
@@ -35,9 +36,16 @@ export default function TripDetails() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'expenses' | 'balances' | 'notes'>('expenses');
+    const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        getExchangeRates('EUR').then(rates => setExchangeRates(rates));
+    }, []);
 
 
     const handleUpdateTrip = async (data: any) => {
+
         if (!tripId) return;
         try {
             await updateTrip(tripId, data);
@@ -89,11 +97,12 @@ export default function TripDetails() {
     }, [tripId]);
 
     const calculateTotals = () => {
-        const totals: Record<string, number> = {};
+        let totalEUR = 0;
         expenses.forEach(exp => {
-            totals[exp.currency] = (totals[exp.currency] || 0) + exp.amount;
+            const amountInEUR = convertCurrency(exp.amount, exp.currency, 'EUR', exchangeRates);
+            totalEUR += amountInEUR;
         });
-        return Object.entries(totals).map(([curr, amount]) => `${amount.toFixed(2)} ${curr}`).join(' + ');
+        return `€${totalEUR.toFixed(2)}`;
     };
 
     if (loading) {
@@ -127,6 +136,66 @@ export default function TripDetails() {
             </div>
         )
     }
+
+    const calculateBalances = () => {
+        if (!trip || !expenses.length) return [];
+
+        const memberBalances: Record<string, number> = {};
+        trip.members.forEach(uid => memberBalances[uid] = 0);
+
+        let totalExpenses = 0;
+
+        expenses.forEach(expense => {
+            const amountInEUR = convertCurrency(expense.amount, expense.currency, 'EUR', exchangeRates);
+            totalExpenses += amountInEUR;
+            if (expense.paidBy) {
+                memberBalances[expense.paidBy] = (memberBalances[expense.paidBy] || 0) + amountInEUR;
+            }
+        });
+
+        const perPersonShare = totalExpenses / trip.members.length;
+
+        const balances = trip.members.map(uid => ({
+            uid,
+            name: memberNames[uid] || 'Unknown',
+            paid: memberBalances[uid] || 0,
+            balance: (memberBalances[uid] || 0) - perPersonShare
+        }));
+
+        return balances.sort((a, b) => b.balance - a.balance);
+    };
+
+    const calculateSettlements = () => {
+        // detailed deep copy to avoid mutating state indirectly if items are references
+        const balances = calculateBalances().map(b => ({ ...b }));
+        const creditors = balances.filter(b => b.balance > 0.01).sort((a, b) => b.balance - a.balance);
+        const debtors = balances.filter(b => b.balance < -0.01).sort((a, b) => a.balance - b.balance);
+
+        const settlements = [];
+        let i = 0;
+        let j = 0;
+
+        while (i < creditors.length && j < debtors.length) {
+            const creditor = creditors[i];
+            const debtor = debtors[j];
+
+            const amount = Math.min(Math.abs(debtor.balance), creditor.balance);
+            if (amount < 0.01) break;
+
+            settlements.push({
+                from: debtor.name,
+                to: creditor.name,
+                amount: amount
+            });
+
+            debtor.balance += amount;
+            creditor.balance -= amount;
+
+            if (Math.abs(debtor.balance) < 0.01) j++;
+            if (creditor.balance < 0.01) i++;
+        }
+        return settlements;
+    };
 
     const formatDate = (timestamp: Timestamp) => {
         if (!timestamp) return '';
@@ -223,9 +292,27 @@ export default function TripDetails() {
                 </div>
             </div>
 
-            {/* Totals Banner */}
-            {expenses.length > 0 && (
-                <div className="bg-white px-4 py-4 border-b border-gray-100 shadow-sm sticky top-[60px] z-20">
+            {/* Tabs */}
+            <div className="bg-white border-b border-gray-200 sticky top-[57px] z-20">
+                <div className="flex p-2 gap-2">
+                    {(['expenses', 'balances', 'notes'] as const).map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors capitalize ${activeTab === tab
+                                ? 'bg-gray-100 text-gray-900'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Totals Banner (Only for Expenses) */}
+            {activeTab === 'expenses' && expenses.length > 0 && (
+                <div className="bg-white px-4 py-4 border-b border-gray-100 shadow-sm sticky top-[115px] z-20">
                     <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Total Spent</p>
                     <p className="text-2xl font-bold text-gray-900">{calculateTotals()}</p>
                 </div>
@@ -235,64 +322,123 @@ export default function TripDetails() {
             <div className="px-4 py-6 space-y-6">
 
                 {/* Expenses List */}
-                <div>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">Recent Expenses</h3>
-                        <button
-                            onClick={() => navigate(`/trip/${tripId}/add-expense`)}
-                            className="text-blue-600 font-medium text-sm"
-                        >
-                            + Add
-                        </button>
-                    </div>
-
-                    {expenses.length === 0 ? (
-                        <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center">
-                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <Tag className="text-gray-400" />
-                            </div>
-                            <p className="text-gray-500 text-sm mb-4">No expenses recorded yet.</p>
+                {activeTab === 'expenses' && (
+                    <div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">Recent Expenses</h3>
                             <button
                                 onClick={() => navigate(`/trip/${tripId}/add-expense`)}
-                                className="px-5 py-2.5 bg-blue-500 text-white rounded-xl font-medium text-sm hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
+                                className="text-blue-600 font-medium text-sm"
                             >
-                                Add First Expense
+                                + Add
                             </button>
                         </div>
-                    ) : (
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div className="divide-y divide-gray-50">
-                                {expenses.map(expense => (
-                                    <div key={expense.id} className="flex items-center p-4 hover:bg-gray-50 transition-colors">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${expense.category === 'Food' ? 'bg-orange-100 text-orange-600' :
-                                            expense.category === 'Transport' ? 'bg-blue-100 text-blue-600' :
-                                                expense.category === 'Hotel' ? 'bg-purple-100 text-purple-600' :
-                                                    'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {getCategoryIcon(expense.category)}
+
+                        {expenses.length === 0 ? (
+                            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center">
+                                <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Tag className="text-gray-400" />
+                                </div>
+                                <p className="text-gray-500 text-sm mb-4">No expenses recorded yet.</p>
+                                <button
+                                    onClick={() => navigate(`/trip/${tripId}/add-expense`)}
+                                    className="px-5 py-2.5 bg-blue-500 text-white rounded-xl font-medium text-sm hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
+                                >
+                                    Add First Expense
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="divide-y divide-gray-50">
+                                    {expenses.map(expense => (
+                                        <div key={expense.id} className="flex items-center p-4 hover:bg-gray-50 transition-colors">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${expense.category === 'Food' ? 'bg-orange-100 text-orange-600' :
+                                                expense.category === 'Transport' ? 'bg-blue-100 text-blue-600' :
+                                                    expense.category === 'Hotel' ? 'bg-purple-100 text-purple-600' :
+                                                        'bg-gray-100 text-gray-600'
+                                                }`}>
+                                                {getCategoryIcon(expense.category)}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-gray-900 font-medium truncate">{expense.description || expense.category}</p>
+                                                <p className="text-xs text-gray-500 truncate">
+                                                    {formatExpenseDate(expense.date)} • {expense.paidBy ? <span className="text-blue-500 font-medium">Paid by {memberNames[expense.paidBy] || expense.paidBy}</span> : expense.category}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-gray-900 font-bold">
+                                                    {expense.amount.toFixed(2)} <span className="text-xs font-medium text-gray-500">{expense.currency}</span>
+                                                </p>
+                                                {expense.currency !== 'EUR' && (
+                                                    <p className="text-xs text-gray-400">
+                                                        ≈ €{convertCurrency(expense.amount, expense.currency, 'EUR', exchangeRates).toFixed(2)}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-gray-900 font-medium truncate">{expense.description || expense.category}</p>
-                                            <p className="text-xs text-gray-500 truncate">
-                                                {formatExpenseDate(expense.date)} • {expense.paidBy ? <span className="text-blue-500 font-medium">Paid by {memberNames[expense.paidBy] || expense.paidBy}</span> : expense.category}
-                                            </p>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Balances Tab */}
+                {activeTab === 'balances' && (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Balances</h3>
+                            <div className="space-y-4">
+                                {calculateBalances().map(member => (
+                                    <div key={member.uid} className="flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3 text-gray-600 font-semibold">
+                                                {member.name.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900">{member.name}</p>
+                                                <p className="text-xs text-gray-500">Paid: €{member.paid.toFixed(2)}</p>
+                                            </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-gray-900 font-bold">
-                                                {expense.amount.toFixed(2)} <span className="text-xs font-medium text-gray-500">{expense.currency}</span>
-                                            </p>
+                                        <div className={`text-right font-bold ${member.balance >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                            {member.balance >= 0 ? '+' : ''}€{member.balance.toFixed(2)}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    )}
-                </div>
 
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Notes</h3>
-                    <p className="text-gray-500 text-sm">No notes pinned.</p>
-                </div>
+                        {/* Settlement Plan (Simple Version) */}
+                        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Settlements</h3>
+                            <p className="text-gray-500 text-sm mb-3">Suggested payments to settle debts.</p>
+                            <div className="space-y-3">
+                                {calculateSettlements().length === 0 ? (
+                                    <p className="text-gray-500 text-sm">No settlements needed.</p>
+                                ) : (
+                                    calculateSettlements().map((settlement, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex items-center space-x-2">
+                                                <span className="font-medium text-gray-900">{settlement.from}</span>
+                                                <LucideIcons.ArrowRight size={16} className="text-gray-400" />
+                                                <span className="font-medium text-gray-900">{settlement.to}</span>
+                                            </div>
+                                            <span className="font-bold text-gray-900">€{settlement.amount.toFixed(2)}</span>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Notes Tab */}
+                {activeTab === 'notes' && (
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Trip Notes</h3>
+                        <p className="text-gray-500 text-sm whitespace-pre-wrap">{trip.description || "No notes added."}</p>
+                    </div>
+                )}
             </div>
             <TripModal
                 isOpen={isEditModalOpen}
