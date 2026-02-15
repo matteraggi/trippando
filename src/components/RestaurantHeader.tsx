@@ -54,16 +54,16 @@ export default function RestaurantHeader({
 
                     {/* Dropdown Menu */}
                     {isMenuOpen && (
-                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 overflow-hidden z-50 animate-in fade-in zoom-in duration-200">
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white hover:bg-red-50  rounded-xl shadow-xl border border-gray-100 py-1 overflow-hidden z-50 animate-in fade-in zoom-in duration-200">
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onDelete();
                                 }}
-                                className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center space-x-3 text-red-600 border-t border-gray-50"
+                                className="w-full px-4 py-3 text-left flex items-center space-x-3 text-red-600"
                             >
                                 <Trash2 size={18} />
-                                <span>Elimina</span>
+                                <span>Elimina Ristorante</span>
                             </button>
                         </div>
                     )}

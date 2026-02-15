@@ -2,7 +2,9 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { subscribeToRestaurant, subscribeToVisits } from '../services/restaurantService';
-import type { Restaurant, Visit } from '../types/Restaurant';
+import { getUsers } from '../services/userService';
+import type { Restaurant } from '../types/Restaurant';
+import type { Visit } from '../types/Visit';
 import LoadingSpinner from '../components/LoadingSpinner';
 import RestaurantHeader from '../components/RestaurantHeader';
 import { Plus, Star, Wallet, Calendar, User } from 'lucide-react';
@@ -16,6 +18,7 @@ export default function RestaurantDetails() {
     const [visits, setVisits] = useState<Visit[]>([]);
     const [loading, setLoading] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [userProfiles, setUserProfiles] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (!restaurantId || !currentUser) return;
@@ -34,6 +37,26 @@ export default function RestaurantDetails() {
             unsubscribeVisits();
         };
     }, [restaurantId, currentUser]);
+
+    // Fetch user profiles for tagged friends
+    useEffect(() => {
+        if (visits.length === 0) return;
+
+        const allUids = new Set<string>();
+        visits.forEach(v => {
+            if (v.taggedFriends) {
+                v.taggedFriends.forEach(uid => allUids.add(uid));
+            }
+        });
+
+        if (allUids.size > 0) {
+            getUsers(Array.from(allUids)).then(users => {
+                const profiles: Record<string, string> = {};
+                users.forEach(u => profiles[u.uid] = u.displayName);
+                setUserProfiles(profiles);
+            });
+        }
+    }, [visits]);
 
     const stats = useMemo(() => {
         if (!visits.length) return { avgRating: 0, avgPrice: 0, count: 0 };
@@ -161,6 +184,18 @@ export default function RestaurantDetails() {
                                         </div>
                                         <span className="font-bold text-gray-900">€{visit.totalPrice?.toFixed(2)}</span>
                                     </div>
+
+                                    {/* Tagged Friends */}
+                                    {visit.taggedFriends && visit.taggedFriends.length > 0 && (
+                                        <div className="flex items-center flex-wrap gap-1 mb-2">
+                                            <User size={12} className="text-gray-400" />
+                                            {visit.taggedFriends.map((uid, idx) => (
+                                                <span key={idx} className="text-xs text-gray-500">
+                                                    {userProfiles[uid] || '...'}{idx < (visit.taggedFriends?.length || 0) - 1 ? ',' : ''}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
 
                                     {visit.notes && (
                                         <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg mt-2">

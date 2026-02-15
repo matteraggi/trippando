@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { X, Calendar, DollarSign, Star, Plus, Trash2, Camera, MapPin, User, Utensils } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Calendar, DollarSign, Star, Plus, Trash2, Camera, MapPin, User, Utensils, Search, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Timestamp } from 'firebase/firestore';
+import type { Visit } from '../types/Visit';
+import { searchUsers, type UserProfile } from '../services/userService';
+import LoadingSpinner from './LoadingSpinner';
 
 interface VisitModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: any) => Promise<void>;
+    onSubmit: (data: Omit<Visit, 'id' | 'createdAt'>) => Promise<void>;
 }
 
 export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProps) {
@@ -15,8 +18,13 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
     const [totalCost, setTotalCost] = useState('');
     const [rating, setRating] = useState(0);
     const [notes, setNotes] = useState('');
-    const [taggedFriends, setTaggedFriends] = useState<string[]>([]);
-    const [newFriend, setNewFriend] = useState('');
+
+    // Friends Tagging State
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
+    const [taggedUsers, setTaggedUsers] = useState<UserProfile[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+
     const [dishes, setDishes] = useState<{ name: string; rating: number }[]>([]);
     const [newDishName, setNewDishName] = useState('');
     const [newDishRating, setNewDishRating] = useState(0);
@@ -24,18 +32,54 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
 
     if (!isOpen) return null;
 
+    // Debounced Search
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (searchTerm.trim().length === 0) {
+                setSearchResults([]);
+                return;
+            }
+
+            setIsSearching(true);
+            try {
+                const users = await searchUsers(searchTerm.trim());
+                setSearchResults(users);
+            } catch (error) {
+                console.error("Search failed", error);
+            } finally {
+                setIsSearching(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    const handleAddUser = (user: UserProfile) => {
+        if (!taggedUsers.find(u => u.uid === user.uid)) {
+            setTaggedUsers([...taggedUsers, user]);
+        }
+        setSearchTerm('');
+        setSearchResults([]);
+    };
+
+    const handleRemoveUser = (uid: string) => {
+        setTaggedUsers(taggedUsers.filter(u => u.uid !== uid));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
             await onSubmit({
                 date: Timestamp.fromDate(new Date(date)),
-                totalCost: parseFloat(totalCost) || 0,
+                totalPrice: parseFloat(totalCost) || 0,
                 rating,
                 notes,
-                taggedFriends,
+                taggedFriends: taggedUsers.map(u => u.uid),
                 dishes,
-                userId: currentUser?.uid
+                userId: currentUser?.uid || '',
+                restaurantId: '', // Parent will override/handle context
+                images: []
             });
             resetForm();
             onClose();
@@ -52,18 +96,12 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
         setTotalCost('');
         setRating(0);
         setNotes('');
-        setTaggedFriends([]);
+        setTaggedUsers([]);
+        setSearchTerm('');
         setDishes([]);
-        setNewFriend('');
         setNewDishName('');
         setNewDishRating(0);
-    };
-
-    const handleAddFriend = () => {
-        if (newFriend.trim()) {
-            setTaggedFriends([...taggedFriends, newFriend.trim()]);
-            setNewFriend('');
-        }
+        setSearchResults([]);
     };
 
     const handleAddDish = () => {
@@ -75,8 +113,8 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+            <div className={`bg-white rounded-2xl w-full max-w-lg shadow-xl flex flex-col max-h-[90vh] sm:animate-in sm:zoom-in-95 animate-slide-up duration-200 transition-all`} onClick={e => e.stopPropagation()}>
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0 rounded-t-2xl">
                     <h2 className="text-lg font-bold text-gray-900">Registra Visita</h2>
                     <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -210,40 +248,59 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                             )}
                         </div>
 
-                        {/* Tagged Friends */}
+                        {/* Tagged Friends (User Search) */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Con chi eri? (Amici)</label>
-                            <div className="flex gap-2 mb-3">
+                            {/* Search Input */}
+                            <div className="relative mb-3">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                 <input
                                     type="text"
-                                    placeholder="Nome amico..."
-                                    className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary-600"
-                                    value={newFriend}
-                                    onChange={(e) => setNewFriend(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            handleAddFriend();
-                                        }
-                                    }}
+                                    placeholder="Cerca amici..."
+                                    className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                 />
-                                <button
-                                    type="button"
-                                    onClick={handleAddFriend}
-                                    className="p-2 bg-primary-100 text-primary-600 rounded-xl hover:bg-primary-200 disabled:opacity-50"
-                                    disabled={!newFriend.trim()}
-                                >
-                                    <Plus size={20} />
-                                </button>
+                                {isSearching && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <LoadingSpinner size={16} className="text-primary-500" />
+                                    </div>
+                                )}
                             </div>
+
+                            {/* Search Results */}
+                            {searchTerm.trim().length > 0 && searchResults.length > 0 && (
+                                <div className="mb-3 max-h-40 overflow-y-auto border border-gray-100 rounded-xl bg-gray-50/50">
+                                    {searchResults.map(user => {
+                                        const isSelected = taggedUsers.some(u => u.uid === user.uid);
+                                        return (
+                                            <button
+                                                key={user.uid}
+                                                type="button"
+                                                onClick={() => !isSelected && handleAddUser(user)}
+                                                className={`w-full flex items-center justify-between p-2 hover:bg-white transition-colors text-left ${isSelected ? 'opacity-50 cursor-default' : ''}`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-xs font-bold">
+                                                        {user.displayName.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <span className="text-sm font-medium text-gray-700">{user.displayName}</span>
+                                                </div>
+                                                {isSelected && <Check size={14} className="text-green-500" />}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
                             <div className="flex flex-wrap gap-2">
-                                {taggedFriends.map((friend, i) => (
+                                {taggedUsers.map((user, i) => (
                                     <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-600 border border-primary-100">
                                         <User size={12} className="mr-1.5 opacity-60" />
-                                        {friend}
+                                        {user.displayName}
                                         <button
                                             type="button"
-                                            onClick={() => setTaggedFriends(taggedFriends.filter(f => f !== friend))}
+                                            onClick={() => handleRemoveUser(user.uid)}
                                             className="ml-1.5 text-primary-400 hover:text-primary-600"
                                         >
                                             <X size={12} />

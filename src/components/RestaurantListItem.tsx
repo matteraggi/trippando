@@ -2,7 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChefHat, MapPin, Star } from 'lucide-react';
 import { subscribeToVisits } from '../services/restaurantService';
-import type { Restaurant, Visit } from '../types/Restaurant';
+import type { Restaurant } from '../types/Restaurant';
+import type { Visit } from '../types/Visit';
 
 interface RestaurantListItemProps {
     restaurant: Restaurant;

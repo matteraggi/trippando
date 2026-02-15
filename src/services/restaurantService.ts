@@ -10,7 +10,8 @@ import {
     doc
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import type { Restaurant, Visit } from '../types/Restaurant';
+import type { Restaurant } from '../types/Restaurant';
+import type { Visit } from '../types/Visit';
 
 export const addRestaurant = async (userId: string, data: Omit<Restaurant, 'id' | 'userId' | 'createdAt' | 'visitCount' | 'averageRating' | 'averagePrice'>) => {
     try {
