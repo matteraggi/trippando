@@ -3,11 +3,11 @@
 - [x] tasto aggiungi note nelle note
 - [x] modifica del nickname in profilo
 - [x] grafico spese per categoria
-- [ ] spostare sezione profilo o mettere sulla stessa riga
+- [x] spostare sezione profilo o mettere sulla stessa riga
 
 ## 🏗️ Phase 1: Architecture & Navigation
-- [ ] **Homepage Redesign**: Create a split view for "My Trips" (Viaggi) and "My Restaurants" (Ristoranti).
-- [ ] **Navigation**: Update bottom navigation or main menu to support new sections.
+- [x] **Homepage Redesign**: Create a split view for "My Trips" (Viaggi) and "My Restaurants" (Ristoranti).
+- [x] **Navigation**: Update bottom navigation or main menu to support new sections.
 
 ## 🍽️ Phase 2: Restaurants (Food Log)
 - [ ] **Database**: Create `restaurants` and `visits` collections in Firebase.
