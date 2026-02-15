@@ -24,7 +24,7 @@ export default function BottomNavigation() {
                         <button
                             key={item.path}
                             onClick={() => navigate(item.path)}
-                            className={`flex flex-col items-center justify-center w-16 py-2 transition-all duration-200 ${active ? 'text-blue-600 scale-105' : 'text-gray-400 hover:text-gray-600'
+                            className={`flex flex-col items-center justify-center w-16 py-2 transition-all duration-200 ${active ? 'text-primary-600 scale-105' : 'text-gray-400 hover:text-gray-600'
                                 }`}
                         >
                             <item.icon size={24} strokeWidth={active ? 2.5 : 2} />

@@ -71,7 +71,7 @@ export default function Profile() {
 
                 {/* Profile Card */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600 relative">
+                    <div className="h-32 bg-gradient-to-r from-primary-500 to-indigo-600 relative">
                         <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
                             <div className="relative">
                                 <div className="w-24 h-24 bg-white rounded-full p-1 shadow-lg">
@@ -98,7 +98,7 @@ export default function Profile() {
                                     type="text"
                                     value={nickname}
                                     onChange={(e) => setNickname(e.target.value)}
-                                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-center font-bold text-gray-900 focus:ring-2 focus:ring-blue-500 outline-none w-48"
+                                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-center font-bold text-gray-900 focus:ring-2 focus:ring-primary-600 outline-none w-48"
                                     placeholder="Il tuo nickname"
                                     autoFocus
                                 />
@@ -126,7 +126,7 @@ export default function Profile() {
                                 </h2>
                                 <button
                                     onClick={() => setIsEditing(true)}
-                                    className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition-colors"
+                                    className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors"
                                 >
                                     <Edit2 size={16} />
                                 </button>

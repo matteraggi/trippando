@@ -56,14 +56,14 @@ export default function AddRestaurantVisit() {
                 {/* Date Section */}
                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                     <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                        <Calendar size={18} className="text-blue-500" />
+                        <Calendar size={18} className="text-primary-600" />
                         Data
                     </label>
                     <input
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full text-lg p-2 border-b-2 border-gray-200 focus:border-blue-500 outline-none bg-transparent transition-colors"
+                        className="w-full text-lg p-2 border-b-2 border-gray-200 focus:border-primary-600 outline-none bg-transparent transition-colors"
                         required
                     />
                 </div>
@@ -128,7 +128,7 @@ export default function AddRestaurantVisit() {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Cosa hai mangiato? Com'era il servizio?"
-                        className="w-full p-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-100 min-h-[120px] resize-none"
+                        className="w-full p-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-primary-100 min-h-[120px] resize-none"
                     />
                 </div>
 
@@ -136,7 +136,7 @@ export default function AddRestaurantVisit() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-blue-600/30 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:scale-100"
+                    className="w-full bg-primary-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-primary-600/30 hover:bg-primary-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:scale-100"
                 >
                     {loading ? (
                         <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />

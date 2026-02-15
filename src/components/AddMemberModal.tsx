@@ -78,7 +78,7 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
                             placeholder="Cerca per nickname..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
                             autoFocus
                         />
                     </div>
@@ -88,7 +88,7 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
                 <div className="flex-1 overflow-y-auto p-2">
                     {loading ? (
                         <div className="flex justify-center py-8">
-                            <LoadingSpinner size={24} color="#3B82F6" />
+                            <LoadingSpinner size={24} className="text-primary-500" />
                         </div>
                     ) : results.length > 0 ? (
                         <div className="space-y-1">
@@ -114,10 +114,10 @@ export default function AddMemberModal({ isOpen, onClose, tripId, currentMembers
                                             <button
                                                 onClick={() => handleAddUser(user)}
                                                 disabled={adding === user.uid}
-                                                className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center transition-colors"
+                                                className="px-3 py-1.5 bg-primary-50 text-primary-600 hover:bg-primary-100 rounded-lg text-xs font-semibold flex items-center transition-colors"
                                             >
                                                 {adding === user.uid ? (
-                                                    <LoadingSpinner size={14} color="#2563EB" />
+                                                    <LoadingSpinner size={14} className="text-primary-600" />
                                                 ) : (
                                                     <>
                                                         <UserPlus size={14} className="mr-1" /> Aggiungi

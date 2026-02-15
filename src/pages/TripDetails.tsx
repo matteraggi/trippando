@@ -130,7 +130,7 @@ export default function TripDetails() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <LoadingSpinner size={32} color="#3B82F6" />
+                <LoadingSpinner size={32} className="text-primary-500" />
             </div>
         );
     }
@@ -141,7 +141,7 @@ export default function TripDetails() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Viaggio non trovato</h2>
                 <button
                     onClick={() => navigate('/')}
-                    className="text-blue-500 hover:underline"
+                    className="text-primary-500 hover:underline"
                 >
                     Torna alla home
                 </button>
@@ -154,7 +154,7 @@ export default function TripDetails() {
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
                 <h2 className="text-xl font-bold text-red-600 mb-2">Accesso Negato</h2>
                 <p className="text-gray-600">Non sei un membro di questo viaggio.</p>
-                <button onClick={() => navigate('/')} className="mt-4 text-blue-500">Torna Indietro</button>
+                <button onClick={() => navigate('/')} className="mt-4 text-primary-500">Torna Indietro</button>
             </div>
         )
     }

@@ -61,7 +61,7 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                 <h3 className="text-lg font-semibold text-gray-900">Spese Recenti</h3>
                 <button
                     onClick={onAddExpense}
-                    className="text-blue-600 font-medium text-sm hover:underline"
+                    className="text-primary-600 font-medium text-sm hover:underline"
                 >
                     + Aggiungi
                 </button>
@@ -75,7 +75,7 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                     <p className="text-gray-500 text-sm mb-4">Nessuna spesa registrata.</p>
                     <button
                         onClick={onAddExpense}
-                        className="px-5 py-2.5 bg-blue-500 text-white rounded-xl font-medium text-sm hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
+                        className="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-medium text-sm hover:bg-primary-600 transition-colors shadow-lg shadow-primary-500/30"
                     >
                         Aggiungi Prima Spesa
                     </button>
@@ -90,7 +90,7 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                                 className="flex items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100"
                             >
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${expense.category === 'Food' ? 'bg-orange-100 text-orange-600' :
-                                    expense.category === 'Transport' ? 'bg-blue-100 text-blue-600' :
+                                    expense.category === 'Transport' ? 'bg-primary-100 text-primary-600' :
                                         expense.category === 'Hotel' ? 'bg-purple-100 text-purple-600' :
                                             'bg-gray-100 text-gray-600'
                                     }`}>
@@ -99,7 +99,7 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                                 <div className="flex-1 min-w-0">
                                     <p className="text-gray-900 font-medium truncate">{expense.description || CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category}</p>
                                     <p className="text-xs text-gray-500 truncate">
-                                        {formatShortDate(expense.date)} • {expense.paidBy ? <span className="text-blue-500 font-medium">{memberNames[expense.paidBy] ? `${memberNames[expense.paidBy]}` : expense.paidBy}</span> : (CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category)}
+                                        {formatShortDate(expense.date)} • {expense.paidBy ? <span className="text-primary-500 font-medium">{memberNames[expense.paidBy] ? `${memberNames[expense.paidBy]}` : expense.paidBy}</span> : (CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category)}
                                     </p>
                                 </div>
                                 <div className="text-right">

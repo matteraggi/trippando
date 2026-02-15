@@ -20,7 +20,7 @@ export const TRIP_ICONS = [
 ];
 
 export const TRIP_COLORS = [
-    'bg-blue-500',
+    'bg-primary-500',
     'bg-indigo-500',
     'bg-purple-500',
     'bg-pink-500',

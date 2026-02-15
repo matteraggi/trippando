@@ -97,7 +97,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                                         required
                                         value={date}
                                         onChange={(e) => setDate(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600 outline-none"
                                     />
                                 </div>
                             </div>
@@ -112,7 +112,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                                         required
                                         value={totalCost}
                                         onChange={(e) => setTotalCost(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-600/20 focus:border-primary-600 outline-none"
                                         placeholder="0.00"
                                     />
                                 </div>
@@ -149,7 +149,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                                 <input
                                     type="text"
                                     placeholder="Nome piatto..."
-                                    className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-blue-500"
+                                    className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary-600"
                                     value={newDishName}
                                     onChange={(e) => setNewDishName(e.target.value)}
                                     // Submit on Enter
@@ -174,7 +174,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                                 <button
                                     type="button"
                                     onClick={handleAddDish}
-                                    className="p-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 disabled:opacity-50"
+                                    className="p-2 bg-primary-600 text-white rounded-xl hover:bg-primary-600 disabled:opacity-50"
                                     disabled={!newDishName.trim()}
                                 >
                                     <Plus size={20} />
@@ -217,7 +217,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                                 <input
                                     type="text"
                                     placeholder="Nome amico..."
-                                    className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-blue-500"
+                                    className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-primary-600"
                                     value={newFriend}
                                     onChange={(e) => setNewFriend(e.target.value)}
                                     onKeyDown={(e) => {
@@ -230,7 +230,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                                 <button
                                     type="button"
                                     onClick={handleAddFriend}
-                                    className="p-2 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-200 disabled:opacity-50"
+                                    className="p-2 bg-primary-100 text-primary-600 rounded-xl hover:bg-primary-200 disabled:opacity-50"
                                     disabled={!newFriend.trim()}
                                 >
                                     <Plus size={20} />
@@ -238,13 +238,13 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {taggedFriends.map((friend, i) => (
-                                    <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                    <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-600 border border-primary-100">
                                         <User size={12} className="mr-1.5 opacity-60" />
                                         {friend}
                                         <button
                                             type="button"
                                             onClick={() => setTaggedFriends(taggedFriends.filter(f => f !== friend))}
-                                            className="ml-1.5 text-blue-400 hover:text-blue-600"
+                                            className="ml-1.5 text-primary-400 hover:text-primary-600"
                                         >
                                             <X size={12} />
                                         </button>
@@ -260,7 +260,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 rows={3}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none resize-none"
                                 placeholder="Com'era l'atmosfera? Servizio?"
                             />
                         </div>
@@ -272,7 +272,7 @@ export default function VisitModal({ isOpen, onClose, onSubmit }: VisitModalProp
                         form="visit-form"
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="w-full py-3 bg-primary-600 text-white rounded-xl font-bold shadow-lg shadow-primary-500/30 hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? 'Salvataggio...' : 'Salva Visita'}
                     </button>

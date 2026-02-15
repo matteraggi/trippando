@@ -72,7 +72,7 @@ export default function Homepage() {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95 transition-transform"
+                    className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-primary-600/30 hover:scale-105 active:scale-95 transition-transform"
                 >
                     <Plus size={24} />
                 </button>
@@ -86,7 +86,7 @@ export default function Homepage() {
                     <input
                         type="text"
                         placeholder="Cerca viaggi..."
-                        className="w-full bg-gray-200/50 pl-10 pr-4 py-2.5 pt-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500/50 transition-all text-sm font-medium"
+                        className="w-full bg-gray-200/50 pl-10 pr-4 py-2.5 pt-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-inset focus:ring-primary-600/50 transition-all text-sm font-medium"
                     />
                 </div>
 
@@ -103,7 +103,7 @@ export default function Homepage() {
                             onClick={() => navigate(`/trip/${trip.id}`)}
                             className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center space-x-4 active:scale-[0.98] transition-transform cursor-pointer"
                         >
-                            <div className={`w-16 h-16 rounded-xl ${trip.color || 'bg-blue-500'} flex items-center justify-center shrink-0 shadow-sm`}>
+                            <div className={`w-16 h-16 rounded-xl ${trip.color || 'bg-primary-600'} flex items-center justify-center shrink-0 shadow-sm`}>
                                 {getTripIcon(trip.icon)}
                             </div>
                             <div className="flex-1 min-w-0">

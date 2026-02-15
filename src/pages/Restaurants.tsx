@@ -50,15 +50,15 @@ export default function Restaurants() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="min-h-screen bg-gray-50 pb-20">
             <header className="px-5 py-6 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10">
                 <div>
+                    <p className="text-gray-500 text-sm font-medium mb-1">Il tuo diario del gusto.</p>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Ristoranti</h1>
-                    <p className="text-gray-500 text-sm font-medium mt-1">Il tuo diario del gusto.</p>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95 transition-transform"
+                    className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-primary-600/30 hover:scale-105 active:scale-95 transition-transform"
                 >
                     <Plus size={24} />
                 </button>
@@ -73,13 +73,13 @@ export default function Restaurants() {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Cerca ristorante o cucina..."
-                        className="w-full bg-gray-200/50 pl-10 pr-4 py-2.5 pt-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500/50 transition-all text-sm font-medium"
+                        className="w-full bg-gray-200/50 pl-10 pr-4 py-2.5 pt-3 rounded-xl border-none outline-none focus:ring-2 focus:ring-inset focus:ring-primary-600/50 transition-all text-sm font-medium"
                     />
                 </div>
 
                 {loading ? (
                     <div className="flex justify-center py-10">
-                        <LoadingSpinner size={32} color="#3B82F6" />
+                        <LoadingSpinner size={32} className="text-primary-600" />
                     </div>
                 ) : filteredRestaurants.length > 0 ? (
                     <div className="space-y-3">

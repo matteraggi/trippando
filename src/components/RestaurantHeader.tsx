@@ -94,7 +94,7 @@ export default function RestaurantHeader({
                             href={restaurant.googleMapsLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 bg-white shadow-sm border border-gray-200 rounded-lg text-blue-600 hover:text-blue-700"
+                            className="p-1.5 bg-white shadow-sm border border-gray-200 rounded-lg text-primary-600 hover:text-primary-700"
                         >
                             <ExternalLink size={16} />
                         </a>

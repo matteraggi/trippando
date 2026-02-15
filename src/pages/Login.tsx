@@ -64,7 +64,7 @@ export default function Login() {
                     {isLogin ? 'Non hai un account? ' : 'Hai già un account? '}
                     <button
                         onClick={() => setIsLogin(!isLogin)}
-                        className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
+                        className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
                     >
                         {isLogin ? 'Registrati' : 'Accedi'}
                     </button>
@@ -116,7 +116,7 @@ export default function Login() {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-600 sm:text-sm transition-all"
                                     placeholder="nome@esempio.com"
                                 />
                             </div>
@@ -138,7 +138,7 @@ export default function Login() {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-600 sm:text-sm transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -148,7 +148,7 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
                                 {loading ? 'Caricamento...' : (isLogin ? 'Accedi' : 'Registrati')}
                             </button>

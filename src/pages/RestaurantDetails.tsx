@@ -63,7 +63,7 @@ export default function RestaurantDetails() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <LoadingSpinner size={32} color="#3B82F6" />
+                <LoadingSpinner size={32} className="text-primary-600" />
             </div>
         );
     }
@@ -72,7 +72,7 @@ export default function RestaurantDetails() {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Ristorante non trovato</h2>
-                <button onClick={() => navigate('/restaurants')} className="text-blue-500 hover:underline">
+                <button onClick={() => navigate('/restaurants')} className="text-primary-600 hover:underline">
                     Torna alla lista
                 </button>
             </div>
@@ -104,7 +104,7 @@ export default function RestaurantDetails() {
                     </div>
 
                     <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
-                        <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2">
+                        <div className="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-2">
                             <Calendar size={16} />
                         </div>
                         <span className="text-xs text-gray-500 font-medium">Visite</span>
@@ -177,9 +177,9 @@ export default function RestaurantDetails() {
             {/* Floating Action Button */}
             <button
                 onClick={() => navigate(`/restaurants/${restaurantId}/add-visit`)}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95 transition-transform z-30"
+                className="fixed bottom-6 right-6 w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-primary-600/30 hover:scale-105 active:scale-95 transition-transform z-30"
             >
-                <Plus size={28} />
+                <Plus size={24} />
             </button>
         </div>
     );

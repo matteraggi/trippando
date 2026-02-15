@@ -24,7 +24,7 @@ const NotesList: React.FC<NotesListProps> = ({
                 <h3 className="text-lg font-semibold text-gray-900">Note di viaggio</h3>
                 <button
                     onClick={onAddNote}
-                    className="text-blue-600 font-medium text-sm flex items-center"
+                    className="text-primary-600 font-medium text-sm flex items-center"
                 >
                     <Plus size={18} className="mr-1" />
                     Nuova Nota
@@ -37,7 +37,7 @@ const NotesList: React.FC<NotesListProps> = ({
                     <p className="text-gray-500 text-sm mb-4">Nessuna nota presente.</p>
                     <button
                         onClick={onAddNote}
-                        className="px-5 py-2.5 bg-blue-500 text-white rounded-xl font-medium text-sm hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30"
+                        className="px-5 py-2.5 bg-primary-500 text-white rounded-xl font-medium text-sm hover:bg-primary-600 transition-colors shadow-lg shadow-primary-500/30"
                     >
                         Aggiungi la prima nota
                     </button>
@@ -51,7 +51,7 @@ const NotesList: React.FC<NotesListProps> = ({
                                 <div className="flex space-x-2">
                                     <button
                                         onClick={() => onEditNote(note)}
-                                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                                     >
                                         <Edit2 size={16} />
                                     </button>

@@ -33,7 +33,7 @@ const TripHeader: React.FC<TripHeaderProps> = ({
                 <div className="flex justify-between items-center">
                     <button
                         onClick={onBack}
-                        className="flex items-center text-blue-500 font-medium -ml-2"
+                        className="flex items-center text-primary-500 font-medium -ml-2"
                     >
                         <ChevronLeft size={24} />
                         Indietro
@@ -82,7 +82,7 @@ const TripHeader: React.FC<TripHeaderProps> = ({
             </header>
 
             {/* Hero / Info */}
-            <div className={`relative h-48 ${trip.color || 'bg-blue-500'} w-full transition-colors duration-300`}>
+            <div className={`relative h-48 ${trip.color || 'bg-primary-500'} w-full transition-colors duration-300`}>
                 <div className="absolute inset-0 flex flex-col justify-end p-6">
                     <div className="text-white">
                         <div className="flex items-center space-x-3 mb-2">

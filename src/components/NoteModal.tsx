@@ -41,8 +41,8 @@ export default function NoteModal({ isOpen, onClose, onSubmit, initialData, titl
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl relative z-10 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={onClose} />
+            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl relative z-10 overflow-hidden flex flex-col animate-fade-in">
 
                 {/* Header */}
                 <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-white">
@@ -60,7 +60,7 @@ export default function NoteModal({ isOpen, onClose, onSubmit, initialData, titl
                             value={noteTitle}
                             onChange={(e) => setNoteTitle(e.target.value)}
                             placeholder="Titolo"
-                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-gray-900"
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-primary-500 outline-none font-semibold text-gray-900"
                             autoFocus
                         />
                     </div>
@@ -68,7 +68,7 @@ export default function NoteModal({ isOpen, onClose, onSubmit, initialData, titl
                         <textarea
                             value={noteContent}
                             onChange={(e) => setNoteContent(e.target.value)}
-                            className="w-full h-48 p-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 outline-none resize-none text-gray-700"
+                            className="w-full h-48 p-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-primary-500 outline-none resize-none text-gray-700"
                             placeholder="Scrivi qui..."
                         />
                     </div>
@@ -77,7 +77,7 @@ export default function NoteModal({ isOpen, onClose, onSubmit, initialData, titl
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 active:scale-95 transition-transform disabled:bg-blue-400 flex items-center"
+                            className="px-6 py-2 bg-primary-600 text-white rounded-xl font-semibold shadow-lg shadow-primary-500/30 active:scale-95 transition-transform disabled:bg-primary-400 flex items-center"
                         >
                             {loading ? <LoadingSpinner size={16} /> : 'Salva Nota'}
                         </button>

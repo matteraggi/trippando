@@ -123,7 +123,7 @@ export default function AddExpense() {
     if (loadingExpense) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <LoadingSpinner size={32} color="#3B82F6" />
+                <LoadingSpinner size={32} className="text-primary-600" />
             </div>
         );
     }
@@ -142,9 +142,9 @@ export default function AddExpense() {
                 <button
                     onClick={handleSubmit}
                     disabled={!amount || isSubmitting}
-                    className={`text-blue-600 font-semibold px-2 py-1 rounded hover:bg-blue-50 transition-colors ${(!amount || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''} flex items-center`}
+                    className={`text-primary-600 font-semibold px-2 py-1 rounded hover:bg-primary-50 transition-colors ${(!amount || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''} flex items-center`}
                 >
-                    {isSubmitting ? <LoadingSpinner size={16} color="#2563EB" /> : 'Salva'}
+                    {isSubmitting ? <LoadingSpinner size={16} className="text-primary-600" /> : 'Salva'}
                 </button>
             </header>
 
@@ -184,7 +184,7 @@ export default function AddExpense() {
                                             type="button"
                                             onClick={() => setPaidBy(currentUser.uid)}
                                             className={`flex flex-shrink-0 items-center space-x-2 px-3 py-2 rounded-full border transition-all ${paidBy === currentUser.uid
-                                                ? 'bg-blue-600 border-blue-600 text-white shadow-md transform scale-105'
+                                                ? 'bg-primary-600 border-primary-600 text-white shadow-md transform scale-105'
                                                 : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                                 }`}
                                         >
@@ -205,7 +205,7 @@ export default function AddExpense() {
                                                 type="button"
                                                 onClick={() => setPaidBy(member.uid)}
                                                 className={`flex flex-shrink-0 items-center space-x-2 px-3 py-2 rounded-full border transition-all ${paidBy === member.uid
-                                                    ? 'bg-blue-600 border-blue-600 text-white shadow-md transform scale-105'
+                                                    ? 'bg-primary-600 border-primary-600 text-white shadow-md transform scale-105'
                                                     : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                                     }`}
                                             >
@@ -229,7 +229,7 @@ export default function AddExpense() {
                                 <button
                                     key={curr}
                                     onClick={() => setCurrency(curr)}
-                                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${currency === curr ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`}
+                                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${currency === curr ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-600'}`}
                                 >
                                     {curr}
                                 </button>
@@ -248,7 +248,7 @@ export default function AddExpense() {
                                 <button
                                     key={cat}
                                     onClick={() => setCategory(cat)}
-                                    className={`py-2 px-1 rounded-lg text-xs font-medium transition-colors border ${category === cat ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}
+                                    className={`py-2 px-1 rounded-lg text-xs font-medium transition-colors border ${category === cat ? 'border-primary-600 bg-primary-50 text-primary-600' : 'border-gray-200 text-gray-600'}`}
                                 >
                                     {CATEGORY_LABELS[cat]}
                                 </button>

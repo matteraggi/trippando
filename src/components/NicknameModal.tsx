@@ -79,7 +79,7 @@ export default function NicknameModal() {
                             value={nickname}
                             onChange={(e) => setNickname(e.target.value)}
                             placeholder="es. Maverick"
-                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-100 focus:border-blue-500 focus:bg-white outline-none transition-all font-medium text-gray-900"
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-100 focus:border-primary-500 focus:bg-white outline-none transition-all font-medium text-gray-900"
                             autoFocus
                             required
                             minLength={2}
@@ -89,7 +89,7 @@ export default function NicknameModal() {
                     <button
                         type="submit"
                         disabled={loading || !nickname.trim()}
-                        className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="w-full py-3.5 bg-primary-600 text-white rounded-xl font-bold shadow-lg shadow-primary-500/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                         {loading ? <LoadingSpinner size={20} color="#ffffff" /> : "Inizia"}
                     </button>

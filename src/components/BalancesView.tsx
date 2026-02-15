@@ -153,7 +153,7 @@ const BalancesView: React.FC<BalancesViewProps> = ({
                     ) : (
                         calculateSettlements().map((settlement, idx) => (
                             <div key={idx} className="flex flex-col p-4 bg-gray-50 rounded-xl border border-gray-100 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-bl-full -mr-8 -mt-8"></div>
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-primary-500/5 rounded-bl-full -mr-8 -mt-8"></div>
 
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="flex flex-col">
@@ -161,7 +161,7 @@ const BalancesView: React.FC<BalancesViewProps> = ({
                                         <span className="font-bold text-gray-900 text-base">{settlement.from}</span>
                                     </div>
                                     <div className="text-right">
-                                        <span className="block text-lg font-bold text-blue-600">€{settlement.amount.toFixed(2)}</span>
+                                        <span className="block text-lg font-bold text-primary-600">€{settlement.amount.toFixed(2)}</span>
                                     </div>
                                 </div>
 

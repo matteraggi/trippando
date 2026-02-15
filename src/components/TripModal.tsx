@@ -18,7 +18,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [selectedIcon, setSelectedIcon] = useState('Plane');
-    const [selectedColor, setSelectedColor] = useState('bg-blue-500');
+    const [selectedColor, setSelectedColor] = useState('bg-primary-500');
     const [loading, setLoading] = useState(false);
 
     const getDateString = (dateVal: any): string => {
@@ -38,14 +38,14 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
             setStartDate(getDateString(initialData.startDate));
             setEndDate(getDateString(initialData.endDate));
             setSelectedIcon(initialData.icon || 'Plane');
-            setSelectedColor(initialData.color || 'bg-blue-500');
+            setSelectedColor(initialData.color || 'bg-primary-500');
         } else if (isOpen) {
             // Reset for new trip
             setName('');
             setStartDate('');
             setEndDate('');
             setSelectedIcon('Plane');
-            setSelectedColor('bg-blue-500');
+            setSelectedColor('bg-primary-500');
         }
     }, [isOpen, initialData]);
 
@@ -73,8 +73,8 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
-            <div className="bg-white w-full sm:w-[450px] sm:rounded-2xl rounded-t-2xl p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-fade-in" onClick={onClose} />
+            <div className="bg-white w-full sm:w-[450px] sm:rounded-2xl rounded-t-2xl p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up sm:animate-in sm:zoom-in-95 duration-200">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-gray-900">{title}</h2>
                     <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-600">
@@ -89,7 +89,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 outline-none text-lg font-medium"
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-primary-500 outline-none text-lg font-medium"
                             placeholder="es. Parigi"
                             required
                         />
@@ -107,7 +107,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
                                         key={item.name}
                                         type="button"
                                         onClick={() => setSelectedIcon(item.name)}
-                                        className={`aspect-square rounded-lg flex items-center justify-center transition-all ${isSelected ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-500' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
+                                        className={`aspect-square rounded-lg flex items-center justify-center transition-all ${isSelected ? 'bg-primary-100 text-primary-600 ring-2 ring-primary-500' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
                                     >
                                         <Icon size={20} />
                                     </button>
@@ -138,7 +138,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
                                 type="date"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-primary-500 outline-none"
                                 required
                             />
                         </div>
@@ -148,7 +148,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
                                 type="date"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-primary-500 outline-none"
                                 required
                             />
                         </div>
@@ -157,7 +157,7 @@ export default function TripModal({ isOpen, onClose, onSubmit, initialData, titl
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-transform mt-4 disabled:bg-blue-400 flex justify-center items-center"
+                        className="w-full py-3.5 bg-primary-600 text-white rounded-xl font-semibold shadow-lg shadow-primary-500/30 active:scale-[0.98] transition-transform mt-4 disabled:bg-primary-400 flex justify-center items-center"
                     >
                         {loading ? <LoadingSpinner /> : buttonText}
                     </button>

@@ -180,16 +180,17 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-md shadow-xl animate-in fade-in zoom-in duration-200 flex flex-col relative max-h-[90vh]">
-                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 shrink-0 rounded-t-2xl">
-                    <h2 className="text-lg font-bold text-gray-900">Nuovo Ristorante</h2>
-                    <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                        <X size={20} className="text-gray-500" />
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-fade-in" onClick={handleClose} />
+            <div className="bg-white w-full sm:w-[450px] sm:rounded-2xl rounded-t-2xl p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up sm:animate-in sm:zoom-in-95 duration-200 flex flex-col">
+                <div className="flex justify-between items-center mb-6 shrink-0">
+                    <h2 className="text-xl font-bold text-gray-900">Nuovo Ristorante</h2>
+                    <button onClick={handleClose} className="p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors">
+                        <X size={20} />
                     </button>
                 </div>
 
-                <div className="p-6 space-y-4 overflow-visible">
+                <div className="space-y-6 overflow-visible">
                     {/* Search Field */}
                     <div className="relative z-40">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Cerca Luogo (OpenStreetMap)</label>
@@ -199,13 +200,13 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-10 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-400"
+                                className="w-full pl-10 pr-10 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all placeholder:text-gray-400"
                                 placeholder="Cerca ristorante..."
                                 autoFocus
                             />
                             {isSearching && (
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-                                    <Loader2 className="text-blue-500 animate-spin" size={18} />
+                                    <Loader2 className="text-primary-500 animate-spin" size={18} />
                                 </div>
                             )}
                         </div>
@@ -242,7 +243,7 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                                 required
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-400"
+                                className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all placeholder:text-gray-400"
                                 placeholder="Es. Da Mario"
                             />
                         </div>
@@ -255,7 +256,7 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                                     type="text"
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-gray-400"
+                                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all placeholder:text-gray-400"
                                     placeholder="Via Roma 1"
                                 />
                             </div>
@@ -266,10 +267,10 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
 
                             <div
                                 onClick={() => setIsTripDropdownOpen(!isTripDropdownOpen)}
-                                className={`w-full pl-3 pr-4 py-2.5 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${isTripDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-200 hover:border-gray-300'}`}
+                                className={`w-full pl-3 pr-4 py-2.5 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${isTripDropdownOpen ? 'border-primary-500 ring-2 ring-primary-500/20' : 'border-gray-200 hover:border-gray-300'}`}
                             >
                                 <div className="flex items-center truncate">
-                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 text-white shrink-0 ${selectedTrip ? (selectedTrip.color || 'bg-blue-500') : 'bg-gray-100 text-gray-400'}`}>
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 text-white shrink-0 ${selectedTrip ? (selectedTrip.color || 'bg-primary-500') : 'bg-gray-100 text-gray-400'}`}>
                                         {selectedTrip ? getTripIcon(selectedTrip.icon) : <Map size={16} />}
                                     </div>
                                     <span className={`truncate ${selectedTrip ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
@@ -293,7 +294,7 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                                             <X size={16} />
                                         </div>
                                         <span>Nessun viaggio</span>
-                                        {selectedTripId === '' && <Check size={16} className="ml-auto text-blue-500" />}
+                                        {selectedTripId === '' && <Check size={16} className="ml-auto text-primary-500" />}
                                     </div>
 
                                     {trips.map(trip => (
@@ -305,13 +306,13 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                                             }}
                                             className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center"
                                         >
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 text-white shrink-0 ${trip.color || 'bg-blue-500'}`}>
+                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 text-white shrink-0 ${trip.color || 'bg-primary-500'}`}>
                                                 {getTripIcon(trip.icon)}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-medium text-gray-900 truncate">{trip.name}</p>
                                             </div>
-                                            {selectedTripId === trip.id && <Check size={16} className="ml-auto text-blue-500" />}
+                                            {selectedTripId === trip.id && <Check size={16} className="ml-auto text-primary-500" />}
                                         </div>
                                     ))}
                                 </div>
@@ -321,7 +322,7 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                         <div className="pt-4">
                             <button
                                 type="submit"
-                                className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/30 hover:bg-blue-700 active:scale-[0.98] transition-all"
+                                className="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold shadow-lg shadow-primary-500/30 hover:bg-primary-700 active:scale-[0.98] transition-all"
                             >
                                 Aggiungi Ristorante
                             </button>

@@ -10,11 +10,12 @@
 - [x] **Navigation**: Update bottom navigation or main menu to support new sections.
 
 ## 🍽️ Phase 2: Restaurants (Food Log)
-- [ ] **Database**: Create `restaurants` and `visits` collections in Firebase.
-- [ ] **Places List**: View all restaurants visited, sorted by rating/date.
-- [ ] **Add Restaurant**: Form to add a new place (Name, Type, Location/Google Maps Link).
-- [ ] **Add Visit Log**: Form to log a visit (Date, Dishes list with ratings, Price, Friends tagged).
-- [ ] **Restaurant Details**: View stats for a specific place (Average rating, Times visited, Visit history).
+- [x] **Database**: Create `restaurants` and `visits` collections in Firebase.
+- [x] **Places List**: View all restaurants visited.
+- [x] **Add Restaurant**: Form to add a new place (Name, Type, Location/Google Maps Link).
+- [x] **Add Visit Log**: Form to log a visit (Date, Rating, Price).
+- [x] **Restaurant Details**: View stats for a specific place (Average rating, Times visited, Visit history).
+- [ ] **Friends Tag**: Add friends to a visit.
 
 ## ✈️ Phase 3: Trip Planning (Itinerary)
 - [ ] **Database**: Add `itinerary` sub-collection or field to Trips.
@@ -27,3 +28,6 @@
 - [ ] **Trip Restaurants**: Tab in Trip Details showing restaurants visited *during* that trip.
 - [ ] **Wishlist**: Feature to add "Places to try" to a trip before visiting.
 - [ ] **Expense Link**: Auto-create an expense when logging a restaurant visit during a trip.
+
+## 🗺️ Phase 5: Maps
+- [ ] **Map View**: Mappa dei ristoranti visitati
