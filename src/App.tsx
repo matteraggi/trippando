@@ -14,6 +14,7 @@ const TripDetails = lazy(() => import('./pages/TripDetails'));
 const AddExpense = lazy(() => import('./pages/AddExpense'));
 const Restaurants = lazy(() => import('./pages/Restaurants'));
 const RestaurantDetails = lazy(() => import('./pages/RestaurantDetails'));
+const AddRestaurantVisit = lazy(() => import('./pages/AddRestaurantVisit'));
 import Layout from './components/Layout';
 
 const App: React.FC = () => {
@@ -43,7 +44,8 @@ const App: React.FC = () => {
                 <Route path="/trip/:tripId" element={<TripDetails />} />
                 <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
                 <Route path="/trip/:tripId/expense/:expenseId" element={<AddExpense />} />
-                <Route path="/restaurant/:restaurantId" element={<RestaurantDetails />} />
+                <Route path="/restaurants/:restaurantId" element={<RestaurantDetails />} />
+                <Route path="/restaurants/:restaurantId/add-visit" element={<AddRestaurantVisit />} />
                 <Route path="/" element={<Navigate to="/home" replace />} />
               </Route>
               <Route path="*" element={<NotFound />} />

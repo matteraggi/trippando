@@ -6,6 +6,9 @@ import type { Restaurant } from '../types/Restaurant';
 import RestaurantModal from '../components/RestaurantModal';
 import { useNavigate } from 'react-router-dom';
 
+import RestaurantListItem from '../components/RestaurantListItem';
+import LoadingSpinner from '../components/LoadingSpinner';
+
 export default function Restaurants() {
     const { currentUser } = useAuth();
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -75,57 +78,13 @@ export default function Restaurants() {
                 </div>
 
                 {loading ? (
-                    <div className="text-center py-10 text-gray-400">Caricamento...</div>
+                    <div className="flex justify-center py-10">
+                        <LoadingSpinner size={32} color="#3B82F6" />
+                    </div>
                 ) : filteredRestaurants.length > 0 ? (
                     <div className="space-y-3">
                         {filteredRestaurants.map(restaurant => (
-                            <div
-                                key={restaurant.id}
-                                onClick={() => navigate(`/restaurant/${restaurant.id}`)}
-                                className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4 active:scale-[0.98] transition-transform cursor-pointer"
-                            >
-                                {/* Left Icon */}
-                                <div className="w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center shrink-0 text-orange-600">
-                                    <ChefHat size={24} />
-                                </div>
-
-                                {/* Center Content */}
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex justify-between items-start">
-                                        <h3 className="text-base font-bold text-gray-900 truncate pr-2">{restaurant.name}</h3>
-
-                                        {/* Rating Badge */}
-                                        {restaurant.averageRating !== undefined && restaurant.averageRating > 0 && (
-                                            <div className="flex items-center bg-gray-50 px-2 py-1 rounded-lg shrink-0">
-                                                <Star size={12} className="text-yellow-400 fill-yellow-400 mr-1" />
-                                                <span className="text-xs font-bold text-gray-700">{restaurant.averageRating.toFixed(1)}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Address / Subtext */}
-                                    <div className="flex items-center text-gray-500 text-xs mt-1">
-                                        <MapPin size={12} className="mr-1 shrink-0" />
-                                        <span className="truncate block">{restaurant.address || 'Nessun indirizzo'}</span>
-                                    </div>
-
-                                    {/* Stats */}
-                                    {(restaurant.visitCount || restaurant.averagePrice) ? (
-                                        <div className="flex items-center gap-2 mt-1.5">
-                                            {restaurant.visitCount !== undefined && restaurant.visitCount > 0 && (
-                                                <span className="text-[10px] font-medium px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                                                    {restaurant.visitCount} visite
-                                                </span>
-                                            )}
-                                            {restaurant.averagePrice !== undefined && restaurant.averagePrice > 0 && (
-                                                <span className="text-[10px] font-medium px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                                                    €{restaurant.averagePrice.toFixed(0)}
-                                                </span>
-                                            )}
-                                        </div>
-                                    ) : null}
-                                </div>
-                            </div>
+                            <RestaurantListItem key={restaurant.id} restaurant={restaurant} />
                         ))}
                     </div>
                 ) : (

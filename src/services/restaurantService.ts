@@ -10,7 +10,7 @@ import {
     doc
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import type { Restaurant } from '../types/Restaurant';
+import type { Restaurant, Visit } from '../types/Restaurant';
 
 export const addRestaurant = async (userId: string, data: Omit<Restaurant, 'id' | 'userId' | 'createdAt' | 'visitCount' | 'averageRating' | 'averagePrice'>) => {
     try {
@@ -59,5 +59,29 @@ export const subscribeToRestaurant = (restaurantId: string, callback: (data: Res
         } else {
             callback(null);
         }
+    });
+};
+
+export const addVisit = async (restaurantId: string, visitData: Omit<Visit, 'id' | 'createdAt'>) => {
+    // 1. Add visit to subcollection
+    const visitRef = await addDoc(collection(db, `restaurants/${restaurantId}/visits`), {
+        ...visitData,
+        createdAt: serverTimestamp()
+    });
+    return visitRef;
+};
+
+export const subscribeToVisits = (restaurantId: string, callback: (data: Visit[]) => void) => {
+    const q = query(
+        collection(db, `restaurants/${restaurantId}/visits`),
+        orderBy("date", "desc")
+    );
+
+    return onSnapshot(q, (snapshot) => {
+        const visits = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as Visit[];
+        callback(visits);
     });
 };

@@ -15,23 +15,18 @@ export interface Restaurant {
     tripId?: string; // Optional link to a specific trip
     userId: string; // The user who added this restaurant to their list
     createdAt: Date;
-
-    visitCount?: number;
-    averageRating?: number;
-    averagePrice?: number;
 }
 
 export interface Visit {
     id: string;
     restaurantId: string;
     userId: string;
-    date: Date;
-    rating: number; // 1-10
+    date: Timestamp;
+    rating: number; // 1-5
     totalPrice: number;
     notes?: string;
-    dishes: {
+    dishes?: {
         name: string;
-        price?: number;
         rating?: number;
     }[];
     images?: string[];

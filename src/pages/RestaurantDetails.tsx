@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { subscribeToRestaurant } from '../services/restaurantService'; // Need to implement/export this
-import type { Restaurant } from '../types/Restaurant';
+import { subscribeToRestaurant, subscribeToVisits } from '../services/restaurantService';
+import type { Restaurant, Visit } from '../types/Restaurant';
 import LoadingSpinner from '../components/LoadingSpinner';
 import RestaurantHeader from '../components/RestaurantHeader';
-import { Plus, Star, Wallet, Calendar } from 'lucide-react';
+import { Plus, Star, Wallet, Calendar, User } from 'lucide-react';
 import { doc, deleteDoc, getFirestore } from 'firebase/firestore';
 
 export default function RestaurantDetails() {
@@ -13,22 +13,40 @@ export default function RestaurantDetails() {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+    const [visits, setVisits] = useState<Visit[]>([]);
     const [loading, setLoading] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         if (!restaurantId || !currentUser) return;
 
-        // Ensure we handle single document subscription
-        // For now, if subscribeToRestaurant isn't available, we might need to use a direct query or update restaurantService
-        // Assuming we will add subscribeToRestaurant to restaurantService
-        const unsubscribe = subscribeToRestaurant(restaurantId, (data) => {
+        const unsubscribeRestaurant = subscribeToRestaurant(restaurantId, (data) => {
             setRestaurant(data);
             setLoading(false);
         });
 
-        return () => unsubscribe();
+        const unsubscribeVisits = subscribeToVisits(restaurantId, (data) => {
+            setVisits(data);
+        });
+
+        return () => {
+            unsubscribeRestaurant();
+            unsubscribeVisits();
+        };
     }, [restaurantId, currentUser]);
+
+    const stats = useMemo(() => {
+        if (!visits.length) return { avgRating: 0, avgPrice: 0, count: 0 };
+
+        const totalRating = visits.reduce((acc, v) => acc + (v.rating || 0), 0);
+        const totalPrice = visits.reduce((acc, v) => acc + (v.totalPrice || 0), 0);
+
+        return {
+            avgRating: totalRating / visits.length,
+            avgPrice: totalPrice / visits.length,
+            count: visits.length
+        };
+    }, [visits]);
 
     const handleDelete = async () => {
         if (!restaurantId || !window.confirm("Sei sicuro di voler eliminare questo ristorante?")) return;
@@ -81,7 +99,7 @@ export default function RestaurantDetails() {
                         </div>
                         <span className="text-xs text-gray-500 font-medium">Media Voto</span>
                         <span className="text-lg font-bold text-gray-900">
-                            {restaurant.averageRating ? restaurant.averageRating.toFixed(1) : '-'}
+                            {stats.avgRating ? stats.avgRating.toFixed(1) : '-'}
                         </span>
                     </div>
 
@@ -91,7 +109,7 @@ export default function RestaurantDetails() {
                         </div>
                         <span className="text-xs text-gray-500 font-medium">Visite</span>
                         <span className="text-lg font-bold text-gray-900">
-                            {restaurant.visitCount || 0}
+                            {stats.count}
                         </span>
                     </div>
 
@@ -101,17 +119,20 @@ export default function RestaurantDetails() {
                         </div>
                         <span className="text-xs text-gray-500 font-medium">Spesa Media</span>
                         <span className="text-lg font-bold text-gray-900">
-                            {restaurant.averagePrice ? `€${restaurant.averagePrice.toFixed(0)}` : '-'}
+                            {stats.avgPrice ? `€${stats.avgPrice.toFixed(0)}` : '-'}
                         </span>
                     </div>
                 </div>
 
-                {/* Visits List Placeholder */}
+                {/* Visits List */}
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-4 px-1">Diario Visite</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 px-1">Diario Visite ({stats.count})</h3>
 
-                    {/* Empty State */}
-                    {(!restaurant.visitCount || restaurant.visitCount === 0) ? (
+                    {visits.length === 0 && loading ? (
+                        <div className="flex justify-center py-8">
+                            <LoadingSpinner size={24} color="#9CA3AF" />
+                        </div>
+                    ) : visits.length === 0 ? (
                         <div className="text-center py-8 bg-white rounded-2xl border border-gray-100 border-dashed">
                             <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                             <p className="text-gray-500 font-medium">Nessuna visita registrata</p>
@@ -120,9 +141,34 @@ export default function RestaurantDetails() {
                             </p>
                         </div>
                     ) : (
-                        <div className="space-y-4">
-                            {/* TODO: Map visits here */}
-                            <p className="text-sm text-gray-500 italic text-center">Lista visite in arrivo...</p>
+                        <div className="space-y-3">
+                            {visits.map((visit) => (
+                                <div key={visit.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium text-gray-900">
+                                                {visit.date?.toDate().toLocaleDateString('it-IT', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                })}
+                                            </span>
+                                            {/* Rating Badge */}
+                                            <div className="flex items-center bg-yellow-50 px-2 py-0.5 rounded-md border border-yellow-100">
+                                                <Star size={12} className="fill-yellow-400 text-yellow-400 mr-1" />
+                                                <span className="text-xs font-bold text-yellow-700">{visit.rating}</span>
+                                            </div>
+                                        </div>
+                                        <span className="font-bold text-gray-900">€{visit.totalPrice?.toFixed(2)}</span>
+                                    </div>
+
+                                    {visit.notes && (
+                                        <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg mt-2">
+                                            {visit.notes}
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
@@ -130,7 +176,7 @@ export default function RestaurantDetails() {
 
             {/* Floating Action Button */}
             <button
-                onClick={() => alert("Aggiungi visita (TODO)")}
+                onClick={() => navigate(`/restaurants/${restaurantId}/add-visit`)}
                 className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95 transition-transform z-30"
             >
                 <Plus size={28} />
