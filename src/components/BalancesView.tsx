@@ -3,6 +3,7 @@ import { ArrowDown } from 'lucide-react';
 import { convertCurrency } from '../services/currencyService';
 import type { Trip } from '../types/Trip';
 import type { Expense } from '../types/Expense';
+import { CATEGORY_LABELS, type ExpenseCategory } from '../constants/expenseConstants';
 
 interface BalancesViewProps {
     trip: Trip;
@@ -246,7 +247,7 @@ const BalancesView: React.FC<BalancesViewProps> = ({
                                             className="w-3 h-3 rounded-full mr-3"
                                             style={{ backgroundColor: CATEGORY_COLORS[cat.category] || CATEGORY_COLORS['Other'] }}
                                         />
-                                        <span className="text-gray-700 text-sm">{cat.category}</span>
+                                        <span className="text-gray-700 text-sm">{CATEGORY_LABELS[cat.category as ExpenseCategory] || cat.category}</span>
                                     </div>
                                     <div className="text-right">
                                         <span className="text-gray-900 font-medium text-sm mr-2">€{cat.amount.toFixed(2)}</span>
