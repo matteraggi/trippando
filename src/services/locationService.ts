@@ -41,14 +41,10 @@ export const searchPlaces = async (query: string): Promise<PlaceResult[]> => {
             format: 'json',
             addressdetails: '1',
             limit: '5',
+            email: 'info@trippando.app'
         });
 
-        const response = await fetch(`${NOMINATIM_BASE_URL}?${params.toString()}`, {
-            headers: {
-                'Accept-Language': 'it-IT',
-                'User-Agent': 'Trippando App (matte@example.com)'
-            }
-        });
+        const response = await fetch(`${NOMINATIM_BASE_URL}?${params.toString()}`);
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
