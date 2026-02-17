@@ -26,8 +26,11 @@ const App: React.FC = () => {
       <NicknameModal />
       <InstallPWA />
       <Router>
-        {/* Main App Container - Fixed to viewport */}
-        <div className="fixed inset-0 bg-gray-50 flex flex-col">
+        {/* Main App Container - Fills #root */}
+        <div className="w-full h-full bg-gray-50 flex flex-col">
+          {/* Safe Area Spacer (Notch) */}
+          <div style={{ height: 'env(safe-area-inset-top)', minHeight: 'env(safe-area-inset-top)' }} className="w-full bg-gray-50 shrink-0" />
+
           {/* Scrollable Content Area */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden relative w-full">
             <Suspense

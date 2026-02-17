@@ -6,7 +6,14 @@
 
     html,
     body {
-        @apply bg-gray-50 text-gray-900 antialiased overflow-hidden fixed w-full h-screen;
+        @apply bg-gray-50 text-gray-900 antialiased w-full h-full;
+        overscroll-behavior: none;
+        /* Prevents rubber-banding at document level */
+    }
+
+    #root {
+        @apply fixed inset-0 w-full h-full overflow-hidden isolated;
+        /* isolated creates new stacking context */
     }
 }
 
