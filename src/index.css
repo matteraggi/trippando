@@ -12,8 +12,9 @@
     }
 
     #root {
-        @apply fixed inset-0 w-full h-full overflow-hidden isolate;
-        /* isolate creates new stacking context */
+        @apply fixed inset-0 w-full overflow-hidden isolate;
+        height: 100dvh;
+        /* Dynamic Viewport Height for mobile browsers */
     }
 }
 
