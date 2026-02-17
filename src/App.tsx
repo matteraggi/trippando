@@ -26,7 +26,7 @@ const App: React.FC = () => {
       <InstallPWA />
       <Router>
         {/* Main App Container - Fixed to viewport */}
-        <div className="fixed inset-0 bg-gray-50 flex flex-col pt-[env(safe-area-inset-top)] pb-0">
+        <div className="fixed inset-0 bg-gray-50 flex flex-col pt-safe pb-safe">
 
           {/* Scrollable Content Area */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden relative w-full">
