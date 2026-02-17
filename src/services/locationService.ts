@@ -57,8 +57,10 @@ export const searchPlaces = async (query: string): Promise<PlaceResult[]> => {
         const data: PlaceResult[] = await response.json();
         console.log(data);
         return data;
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error searching places:", error);
+        // Temporary debug for mobile
+        alert(`Search Error: ${error.message || error}`);
         return [];
     }
 };

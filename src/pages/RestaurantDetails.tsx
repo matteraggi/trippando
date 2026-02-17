@@ -103,7 +103,7 @@ export default function RestaurantDetails() {
     }
 
     return (
-        <div className="min-h-full bg-gray-50 pb-6">
+        <div className="min-h-full bg-gray-50 pb-12">
             <RestaurantHeader
                 restaurant={restaurant}
                 onBack={() => navigate('/restaurants')}

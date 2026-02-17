@@ -92,7 +92,7 @@ export default function Profile() {
     }
 
     return (
-        <div className="min-h-full bg-gray-50 pb-20">
+        <div className="min-h-full bg-gray-50 pb-24">
             <header className="px-5 py-6 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Profilo</h1>

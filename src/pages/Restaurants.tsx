@@ -50,7 +50,7 @@ export default function Restaurants() {
     );
 
     return (
-        <div className="min-h-full bg-gray-50 pb-20">
+        <div className="min-h-full bg-gray-50 pb-24">
             <header className="px-5 py-6 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10">
                 <div>
                     <p className="text-gray-500 text-sm font-medium mb-1">Il tuo diario del gusto.</p>
