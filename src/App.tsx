@@ -27,7 +27,9 @@ const App: React.FC = () => {
       <InstallPWA />
       <Router>
         {/* Main App Container - Fills #root */}
-        <div className="w-full h-full bg-gray-50 flex flex-col pt-[env(safe-area-inset-top)]">
+        <div className="w-full h-screen bg-gray-50 flex flex-col">
+          {/* Safe Area Spacer (Notch) */}
+          <div style={{ minHeight: 'env(safe-area-inset-top)' }} className="w-full bg-gray-50 shrink-0" />
 
           {/* Scrollable Content Area */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden relative w-full">
