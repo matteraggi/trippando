@@ -17,16 +17,16 @@ export default function BottomNavigation() {
 
     return (
         <div
-            className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 h-16"
+            className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-[env(safe-area-inset-bottom)]"
         >
-            <div className="flex justify-around items-center max-w-md mx-auto">
+            <div className="flex justify-around items-center max-w-md mx-auto h-16">
                 {navItems.map((item) => {
                     const active = isActive(item.path);
                     return (
                         <button
                             key={item.path}
                             onClick={() => navigate(item.path)}
-                            className={`flex flex-col items-center justify-center w-16 py-2 transition-all duration-200 ${active ? 'text-primary-600 scale-105' : 'text-gray-400 hover:text-gray-600'
+                            className={`flex flex-col items-center justify-center w-16 h-full transition-all duration-200 ${active ? 'text-primary-600 scale-105' : 'text-gray-400 hover:text-gray-600'
                                 }`}
                         >
                             <item.icon size={24} strokeWidth={active ? 2.5 : 2} />
