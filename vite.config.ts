@@ -15,23 +15,43 @@ export default defineConfig({
         description: 'Travel expense tracker',
         theme_color: '#ffffff',
         display: 'standalone',
+        orientation: 'portrait',
         background_color: '#ffffff',
+        start_url: '.',
         icons: [
-          {
-            src: 'trippando_logo.png',
-            sizes: '500x500',
-            type: 'image/png'
-          },
           {
             src: 'trippando_logo.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any maskable'
+          },
+          {
+            src: 'trippando_logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ],
+        screenshots: [
+          {
+            src: "trippando_logo.png", // Placeholder
+            sizes: "512x512",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Trippando Home"
+          },
+          {
+            src: "trippando_logo.png", // Placeholder
+            sizes: "512x512",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Trippando Mobile"
           }
         ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        navigateFallback: '/offline.html',
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -40,7 +60,21 @@ export default defineConfig({
               cacheName: 'google-fonts-cache',
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 365 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'gstatic-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 365 days
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -48,7 +82,8 @@ export default defineConfig({
             }
           }
         ]
-      }
+      },
+      injectRegister: 'auto'
     }),
   ],
   build: {

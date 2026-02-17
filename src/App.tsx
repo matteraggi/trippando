@@ -17,10 +17,15 @@ const RestaurantDetails = lazy(() => import('./pages/RestaurantDetails'));
 const AddRestaurantVisit = lazy(() => import('./pages/AddRestaurantVisit'));
 import Layout from './components/Layout';
 
+import InstallPWA from './components/InstallPWA';
+import ReloadPrompt from './components/ReloadPrompt';
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <NicknameModal />
+      <ReloadPrompt />
+      <InstallPWA />
       <Router>
         <div className="min-h-screen pt-safe pb-safe">
           <Suspense
