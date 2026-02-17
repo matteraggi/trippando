@@ -15,7 +15,6 @@ export default defineConfig({
         description: 'Travel expense tracker',
         theme_color: '#ffffff',
         display: 'standalone',
-        orientation: 'portrait',
         background_color: '#ffffff',
         start_url: '.',
         icons: [
