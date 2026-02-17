@@ -138,14 +138,14 @@ export default function AddExpense() {
 
     if (loadingExpense) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-full bg-gray-50 flex items-center justify-center">
                 <LoadingSpinner size={32} className="text-primary-600" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-full bg-gray-50 flex flex-col">
             {/* Header */}
             <header className="px-4 py-4 flex justify-between items-center bg-white border-b border-gray-100 sticky top-0 z-10">
                 <button

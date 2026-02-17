@@ -85,7 +85,7 @@ export default function RestaurantDetails() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="flex items-center justify-center min-h-full bg-gray-50">
                 <LoadingSpinner size={32} className="text-primary-600" />
             </div>
         );
@@ -93,7 +93,7 @@ export default function RestaurantDetails() {
 
     if (!restaurant) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+            <div className="flex flex-col items-center justify-center min-h-full bg-gray-50 p-4">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Ristorante non trovato</h2>
                 <button onClick={() => navigate('/restaurants')} className="text-primary-600 hover:underline">
                     Torna alla lista
@@ -103,7 +103,7 @@ export default function RestaurantDetails() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="min-h-full bg-gray-50 pb-6">
             <RestaurantHeader
                 restaurant={restaurant}
                 onBack={() => navigate('/restaurants')}

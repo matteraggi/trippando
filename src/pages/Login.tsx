@@ -50,7 +50,7 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col justify-center py-12 px-6 lg:px-8">
+        <div className="min-h-full bg-white flex flex-col justify-center py-12 px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <img
                     className="mx-auto h-24 w-auto object-contain mb-4"

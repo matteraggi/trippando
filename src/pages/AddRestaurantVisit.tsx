@@ -84,7 +84,7 @@ export default function AddRestaurantVisit() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-safe">
+        <div className="min-h-full bg-gray-50 pb-safe">
             {/* Header */}
             <div className="bg-white px-4 py-4 flex items-center shadow-sm sticky top-0 z-10">
                 <button

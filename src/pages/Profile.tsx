@@ -85,14 +85,14 @@ export default function Profile() {
 
     if (loadingProfile) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="flex items-center justify-center min-h-full bg-gray-50">
                 <LoadingSpinner size={32} className="text-primary-500" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="min-h-full bg-gray-50 pb-20">
             <header className="px-5 py-6 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Profilo</h1>

@@ -27,35 +27,39 @@ const App: React.FC = () => {
       <ReloadPrompt />
       <InstallPWA />
       <Router>
-        <div className="min-h-screen pt-safe pb-safe">
-          <Suspense
-            fallback={
-              <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
-                <LoadingSpinner size={40} color="#3B82F6" />
-              </div>
-            }
-          >
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route element={<PrivateRoute />}>
-                {/* Main Tab Routes with Bottom Navigation */}
-                <Route element={<Layout />}>
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/restaurants" element={<Restaurants />} />
-                  <Route path="/profile" element={<Profile />} />
-                </Route>
+        {/* Main App Container - Fixed to viewport, respects Safe Areas */}
+        <div className="fixed inset-0 w-full h-[100dvh] bg-gray-50 flex flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto overflow-x-hidden relative w-full">
+            <Suspense
+              fallback={
+                <div className="h-full w-full flex items-center justify-center bg-gray-50">
+                  <LoadingSpinner size={40} color="#3B82F6" />
+                </div>
+              }
+            >
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route element={<PrivateRoute />}>
+                  {/* Main Tab Routes with Bottom Navigation */}
+                  <Route element={<Layout />}>
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/restaurants" element={<Restaurants />} />
+                    <Route path="/profile" element={<Profile />} />
+                  </Route>
 
-                {/* Sub-pages without Bottom Navigation */}
-                <Route path="/trip/:tripId" element={<TripDetails />} />
-                <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
-                <Route path="/trip/:tripId/expense/:expenseId" element={<AddExpense />} />
-                <Route path="/restaurants/:restaurantId" element={<RestaurantDetails />} />
-                <Route path="/restaurants/:restaurantId/add-visit" element={<AddRestaurantVisit />} />
-                <Route path="/" element={<Navigate to="/home" replace />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+                  {/* Sub-pages without Bottom Navigation */}
+                  <Route path="/trip/:tripId" element={<TripDetails />} />
+                  <Route path="/trip/:tripId/add-expense" element={<AddExpense />} />
+                  <Route path="/trip/:tripId/expense/:expenseId" element={<AddExpense />} />
+                  <Route path="/restaurants/:restaurantId" element={<RestaurantDetails />} />
+                  <Route path="/restaurants/:restaurantId/add-visit" element={<AddRestaurantVisit />} />
+                  <Route path="/" element={<Navigate to="/home" replace />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </div>
         </div>
       </Router>
     </AuthProvider>

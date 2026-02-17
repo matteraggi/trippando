@@ -129,7 +129,7 @@ export default function TripDetails() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="flex items-center justify-center min-h-full bg-gray-50">
                 <LoadingSpinner size={32} className="text-primary-500" />
             </div>
         );
@@ -137,7 +137,7 @@ export default function TripDetails() {
 
     if (!trip) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+            <div className="flex flex-col items-center justify-center min-h-full bg-gray-50 p-4">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Viaggio non trovato</h2>
                 <button
                     onClick={() => navigate('/')}
@@ -151,7 +151,7 @@ export default function TripDetails() {
 
     if (currentUser && !trip.members.includes(currentUser.uid)) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+            <div className="flex flex-col items-center justify-center min-h-full bg-gray-50 p-4">
                 <h2 className="text-xl font-bold text-red-600 mb-2">Accesso Negato</h2>
                 <p className="text-gray-600">Non sei un membro di questo viaggio.</p>
                 <button onClick={() => navigate('/')} className="mt-4 text-primary-500">Torna Indietro</button>
@@ -160,7 +160,7 @@ export default function TripDetails() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-6">
+        <div className="min-h-full bg-gray-50 pb-6">
             <TripHeader
                 trip={trip}
                 onBack={() => navigate(-1)}

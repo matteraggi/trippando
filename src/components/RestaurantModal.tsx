@@ -182,17 +182,19 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-fade-in" onClick={handleClose} />
-            <div className="bg-white w-full sm:w-[450px] sm:rounded-2xl rounded-t-2xl p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto animate-slide-up sm:animate-in sm:zoom-in-95 duration-200 flex flex-col">
-                <div className="flex justify-between items-center mb-6 shrink-0">
-                    <h2 className="text-xl font-bold text-gray-900">Nuovo Ristorante</h2>
-                    <button onClick={handleClose} className="p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors">
-                        <X size={20} />
-                    </button>
-                </div>
+            <div className="bg-white w-full sm:w-[450px] sm:rounded-2xl rounded-t-2xl relative shadow-2xl max-h-[90vh] flex flex-col animate-slide-up sm:animate-in sm:zoom-in-95 duration-200">
 
-                <div className="space-y-6 overflow-visible">
-                    {/* Search Field */}
-                    <div className="relative z-40">
+                {/* Fixed Header Section with Title and Search */}
+                <div className="p-6 pb-2 shrink-0 z-20">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-gray-900">Nuovo Ristorante</h2>
+                        <button onClick={handleClose} className="p-2 bg-gray-100 rounded-full text-gray-600 hover:bg-gray-200 transition-colors">
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    {/* Search Field Container - Relative for dropdown positioning */}
+                    <div className="relative">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Cerca Luogo (OpenStreetMap)</label>
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -211,9 +213,9 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                             )}
                         </div>
 
-                        {/* Search Results Dropdown */}
+                        {/* Search Results Dropdown - Floating Absolute */}
                         {showResults && searchResults.length > 0 && (
-                            <div className="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto divide-y divide-gray-50">
+                            <div className="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto divide-y divide-gray-50 z-50">
                                 {searchResults.map((place) => (
                                     <button
                                         key={place.place_id}
@@ -230,9 +232,12 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                             </div>
                         )}
                     </div>
+                </div>
 
-                    <div className="relative border-t border-gray-100 pt-4">
-                        <p className="text-xs text-gray-400 mb-4 text-center uppercase tracking-wider font-medium">Oppure inserisci manualmente</p>
+                {/* Scrollable Content Section */}
+                <div className="flex-1 overflow-y-auto p-6 pt-2">
+                    <div className="relative border-t border-gray-100 pt-4 mb-4">
+                        <p className="text-xs text-center text-gray-400 uppercase tracking-wider font-medium bg-white px-2 absolute left-1/2 -translate-x-1/2 -top-2.5">Oppure manualmente</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -282,7 +287,7 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
 
                             {/* Dropdown Options */}
                             {isTripDropdownOpen && (
-                                <div className="absolute z-50 left-0 right-0 bottom-full bg-white rounded-xl shadow-xl border border-gray-100 max-h-60 overflow-y-auto">
+                                <div className="absolute z-50 left-0 right-0 bottom-full mb-1 bg-white rounded-xl shadow-xl border border-gray-100 max-h-48 overflow-y-auto">
                                     <div
                                         onClick={() => {
                                             setSelectedTripId('');
@@ -319,7 +324,7 @@ export default function RestaurantModal({ isOpen, onClose, onSubmit }: Restauran
                             )}
                         </div>
 
-                        <div className="pt-4">
+                        <div className="pt-4 pb-2">
                             <button
                                 type="submit"
                                 className="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold shadow-lg shadow-primary-500/30 hover:bg-primary-700 active:scale-[0.98] transition-all"

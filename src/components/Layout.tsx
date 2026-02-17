@@ -5,7 +5,7 @@ import BottomNavigation from './BottomNavigation';
 
 export default function Layout() {
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-full bg-gray-50">
             <Outlet />
             <BottomNavigation />
         </div>
