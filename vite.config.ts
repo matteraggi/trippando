@@ -20,13 +20,13 @@ export default defineConfig({
         start_url: '.',
         icons: [
           {
-            src: 'trippando_logo.png',
+            src: 'trippando_pwa_logo.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any maskable'
           },
           {
-            src: 'trippando_logo.png',
+            src: 'trippando_pwa_logo.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
@@ -34,14 +34,14 @@ export default defineConfig({
         ],
         screenshots: [
           {
-            src: "trippando_logo.png", // Placeholder
+            src: "trippando_pwa_logo.png", // Placeholder
             sizes: "512x512",
             type: "image/png",
             form_factor: "wide",
             label: "Trippando Home"
           },
           {
-            src: "trippando_logo.png", // Placeholder
+            src: "trippando_pwa_logo.png", // Placeholder
             sizes: "512x512",
             type: "image/png",
             form_factor: "narrow",
