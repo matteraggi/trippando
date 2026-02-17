@@ -18,12 +18,14 @@ import Layout from './components/Layout';
 
 import InstallPWA from './components/InstallPWA';
 import ReloadPrompt from './components/ReloadPrompt';
+// Lazy load pages
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <NicknameModal />
       <InstallPWA />
+      <ReloadPrompt />
       <Router>
         {/* Main App Container - Fixed to viewport */}
         <div className="fixed inset-0 bg-gray-50 flex flex-col pt-safe pb-safe">

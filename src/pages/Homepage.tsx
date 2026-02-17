@@ -67,7 +67,7 @@ export default function Homepage() {
             {/* Header */}
             <header className="px-5 py-6 flex justify-between items-center sticky top-0 bg-gray-50/90 backdrop-blur-md z-10 transition-all">
                 <div>
-                    <p className="text-gray-500 text-sm font-medium mb-1">Bentornato{currentUser?.displayName ? `, ${currentUser.displayName}` : ''}</p>
+                    <p className="text-gray-500 text-sm font-medium mb-1">Ciao{currentUser?.displayName ? `, ${currentUser.displayName}` : ''}</p>
                     <h1 className="text-3xl font-bold text-gray-900 tracking-tight">I miei Viaggi</h1>
                 </div>
                 <button
