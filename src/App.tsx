@@ -4,7 +4,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import NicknameModal from './components/NicknameModal';
 import LoadingSpinner from './components/LoadingSpinner';
-
 // Lazy load pages
 const Login = lazy(() => import('./pages/Login'));
 const NotFound = lazy(() => import('./pages/NotFound'));

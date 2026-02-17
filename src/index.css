@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @layer base {
 
     html,
@@ -20,10 +25,14 @@
 
 @layer utilities {
     .pt-safe {
-        padding-top: env(safe-area-inset-top);
+        padding-top: var(--safe-area-inset-top);
+    }
+
+    .pb-safe {
+        padding-bottom: var(--safe-area-inset-bottom);
     }
 
     .min-h-safe {
-        min-height: calc(100vh - env(safe-area-inset-top));
+        min-height: calc(100vh - var(--safe-area-inset-top));
     }
 }
