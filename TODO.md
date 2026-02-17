@@ -5,11 +5,11 @@
 - [x] grafico spese per categoria
 - [x] spostare sezione profilo o mettere sulla stessa riga
 
-- [ ] scorrimento pwa non sopra il notch
-- [ ] scorrimento non esistente se non serve
-- [ ] non va più openstreetmap da mobile
+- [x] scorrimento pwa non sopra il notch
+- [x] scorrimento non esistente se non serve
+- [x] non va più openstreetmap da mobile
 
-- [ ] eliminare e modificare visite al ristorante
+- [x] eliminare e modificare visite al ristorante
 - [ ] mostra luogo e visita anche ai taggati
 
 ## Phase 1: Architecture & Navigation

@@ -7,7 +7,10 @@ import {
     onSnapshot,
     Timestamp,
     serverTimestamp,
-    doc
+    doc,
+    deleteDoc,
+    updateDoc,
+    getDoc
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import type { Restaurant } from '../types/Restaurant';
@@ -85,4 +88,40 @@ export const subscribeToVisits = (restaurantId: string, callback: (data: Visit[]
         })) as Visit[];
         callback(visits);
     });
+};
+
+export const deleteVisit = async (restaurantId: string, visitId: string) => {
+    try {
+        await deleteDoc(doc(db, `restaurants/${restaurantId}/visits`, visitId));
+    } catch (error) {
+        console.error("Error deleting visit: ", error);
+        throw error;
+    }
+};
+
+export const updateVisit = async (restaurantId: string, visitId: string, visitData: Partial<Visit>) => {
+    try {
+        const visitRef = doc(db, `restaurants/${restaurantId}/visits`, visitId);
+        await updateDoc(visitRef, {
+            ...visitData,
+            updatedAt: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error updating visit: ", error);
+        throw error;
+    }
+};
+
+export const getVisit = async (restaurantId: string, visitId: string) => {
+    try {
+        const visitRef = doc(db, `restaurants/${restaurantId}/visits`, visitId);
+        const visitSnap = await getDoc(visitRef);
+        if (visitSnap.exists()) {
+            return { id: visitSnap.id, ...visitSnap.data() } as Visit;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting visit: ", error);
+        throw error;
+    }
 };

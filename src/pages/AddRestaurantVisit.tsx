@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { addVisit } from '../services/restaurantService';
-import { searchUsers, type UserProfile } from '../services/userService';
+import { addVisit, getVisit, updateVisit } from '../services/restaurantService';
+import { searchUsers, getUsers, type UserProfile } from '../services/userService';
 import { Star, ArrowLeft, Calendar, Euro, Save, User, Plus, X, Search, Check } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function AddRestaurantVisit() {
-    const { restaurantId } = useParams<{ restaurantId: string }>();
+    const { restaurantId, visitId } = useParams<{ restaurantId: string; visitId?: string }>();
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const isEditing = !!visitId;
 
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [rating, setRating] = useState(5);
@@ -24,6 +25,45 @@ export default function AddRestaurantVisit() {
     const [isSearching, setIsSearching] = useState(false);
 
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(false);
+
+    // Fetch existing visit data if editing
+    useEffect(() => {
+        if (!restaurantId || !visitId) return;
+
+        const loadVisit = async () => {
+            setFetching(true);
+            try {
+                const visit = await getVisit(restaurantId, visitId);
+                if (visit) {
+                    setDate(visit.date instanceof Timestamp ? visit.date.toDate().toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+                    setRating(visit.rating);
+                    setPrice(visit.totalPrice?.toString() || '');
+                    setNotes(visit.notes || '');
+
+                    // Fetch profiles for tagged friends
+                    if (visit.taggedFriends && visit.taggedFriends.length > 0) {
+                        try {
+                            const profiles = await getUsers(visit.taggedFriends);
+                            setTaggedUsers(profiles);
+                        } catch (err) {
+                            console.error("Error fetching tagged users", err);
+                        }
+                    }
+                } else {
+                    alert("Visita non trovata");
+                    navigate(-1);
+                }
+            } catch (error) {
+                console.error("Error loading visit", error);
+                alert("Errore nel caricamento della visita");
+            } finally {
+                setFetching(false);
+            }
+        };
+
+        loadVisit();
+    }, [restaurantId, visitId, navigate]);
 
     // Debounced Search
     useEffect(() => {
@@ -65,7 +105,7 @@ export default function AddRestaurantVisit() {
 
         setLoading(true);
         try {
-            await addVisit(restaurantId, {
+            const visitData = {
                 userId: currentUser.uid,
                 restaurantId,
                 date: Timestamp.fromDate(new Date(date)),
@@ -73,15 +113,29 @@ export default function AddRestaurantVisit() {
                 totalPrice: parseFloat(price) || 0,
                 notes,
                 taggedFriends: taggedUsers.map(u => u.uid),
-            });
+            };
+
+            if (isEditing && visitId) {
+                await updateVisit(restaurantId, visitId, visitData);
+            } else {
+                await addVisit(restaurantId, visitData);
+            }
             navigate(-1);
         } catch (error) {
-            console.error("Failed to add visit", error);
+            console.error("Failed to save visit", error);
             alert("Errore durante il salvataggio della visita");
         } finally {
             setLoading(false);
         }
     };
+
+    if (fetching) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <LoadingSpinner size={32} />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-full bg-gray-50 pb-safe">
@@ -93,7 +147,9 @@ export default function AddRestaurantVisit() {
                 >
                     <ArrowLeft size={24} />
                 </button>
-                <h1 className="text-xl font-bold text-gray-900 ml-2">Nuova Visita</h1>
+                <h1 className="text-xl font-bold text-gray-900 ml-2">
+                    {isEditing ? 'Modifica Visita' : 'Nuova Visita'}
+                </h1>
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-6 max-w-lg mx-auto">
@@ -254,7 +310,7 @@ export default function AddRestaurantVisit() {
                     ) : (
                         <>
                             <Save size={24} />
-                            Salva Visita
+                            {isEditing ? 'Aggiorna Visita' : 'Salva Visita'}
                         </>
                     )}
                 </button>

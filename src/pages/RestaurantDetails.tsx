@@ -7,8 +7,9 @@ import type { Restaurant } from '../types/Restaurant';
 import type { Visit } from '../types/Visit';
 import LoadingSpinner from '../components/LoadingSpinner';
 import RestaurantHeader from '../components/RestaurantHeader';
-import { Plus, Star, Wallet, Calendar, User } from 'lucide-react';
+import { Plus, Star, Wallet, Calendar, User, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { doc, deleteDoc, getFirestore } from 'firebase/firestore';
+import { deleteVisit } from '../services/restaurantService';
 
 export default function RestaurantDetails() {
     const { restaurantId } = useParams<{ restaurantId: string }>();
@@ -18,6 +19,7 @@ export default function RestaurantDetails() {
     const [visits, setVisits] = useState<Visit[]>([]);
     const [loading, setLoading] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [activeVisitMenu, setActiveVisitMenu] = useState<string | null>(null);
     const [userProfiles, setUserProfiles] = useState<Record<string, string>>({});
 
     useEffect(() => {
@@ -82,6 +84,31 @@ export default function RestaurantDetails() {
             alert("Errore durante l'eliminazione");
         }
     };
+
+    const handleDeleteVisit = async (visitId: string) => {
+        setActiveVisitMenu(null);
+        if (!restaurantId || !window.confirm("Sei sicuro di voler eliminare questa visita?")) return;
+        try {
+            await deleteVisit(restaurantId, visitId);
+        } catch (error) {
+            console.error("Failed to delete visit", error);
+            alert("Errore durante l'eliminazione della visita");
+        }
+    };
+
+    const handleEditVisit = (visitId: string) => {
+        setActiveVisitMenu(null);
+        navigate(`/restaurants/${restaurantId}/visit/${visitId}/edit`);
+    };
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => setActiveVisitMenu(null);
+        if (activeVisitMenu) {
+            document.addEventListener('click', handleClickOutside);
+        }
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [activeVisitMenu]);
 
     if (loading) {
         return (
@@ -182,7 +209,41 @@ export default function RestaurantDetails() {
                                                 <span className="text-xs font-bold text-yellow-700">{visit.rating}</span>
                                             </div>
                                         </div>
-                                        <span className="font-bold text-gray-900">€{visit.totalPrice?.toFixed(2)}</span>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-bold text-gray-900">€{visit.totalPrice?.toFixed(2)}</span>
+
+                                            {/* Action Menu */}
+                                            <div className="relative">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setActiveVisitMenu(activeVisitMenu === visit.id ? null : visit.id!);
+                                                    }}
+                                                    className="p-1 -mr-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+                                                >
+                                                    <MoreVertical size={16} />
+                                                </button>
+
+                                                {activeVisitMenu === visit.id && (
+                                                    <div className="absolute right-0 top-8 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px] z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                                                        <button
+                                                            onClick={() => handleEditVisit(visit.id!)}
+                                                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 text-left"
+                                                        >
+                                                            <Edit size={14} />
+                                                            Modifica
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteVisit(visit.id!)}
+                                                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                            Elimina
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* Tagged Friends */}
