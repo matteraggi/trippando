@@ -10,7 +10,9 @@ import {
     doc,
     deleteDoc,
     updateDoc,
-    getDoc
+    getDoc,
+    arrayUnion,
+    or
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import type { Restaurant } from '../types/Restaurant';
@@ -38,7 +40,10 @@ export const addRestaurant = async (userId: string, data: Omit<Restaurant, 'id' 
 export const subscribeToRestaurants = (userId: string, callback: (restaurants: Restaurant[]) => void) => {
     const q = query(
         collection(db, 'restaurants'),
-        where('userId', '==', userId),
+        or(
+            where('userId', '==', userId),
+            where('sharedWith', 'array-contains', userId)
+        ),
         orderBy('createdAt', 'desc')
     );
 
@@ -72,14 +77,35 @@ export const addVisit = async (restaurantId: string, visitData: Omit<Visit, 'id'
         ...visitData,
         createdAt: serverTimestamp()
     });
+
+    // 2. If there are tagged friends, update the restaurant's sharedWith array
+    if (visitData.taggedFriends && visitData.taggedFriends.length > 0) {
+        const restaurantRef = doc(db, 'restaurants', restaurantId);
+        await updateDoc(restaurantRef, {
+            sharedWith: arrayUnion(...visitData.taggedFriends)
+        });
+    }
+
     return visitRef;
 };
 
-export const subscribeToVisits = (restaurantId: string, callback: (data: Visit[]) => void) => {
-    const q = query(
-        collection(db, `restaurants/${restaurantId}/visits`),
-        orderBy("date", "desc")
-    );
+export const subscribeToVisits = (restaurantId: string, currentUserId: string, restaurantOwnerId: string, callback: (data: Visit[]) => void) => {
+    let q;
+
+    // If I am the owner, I see everything.
+    // If I am NOT the owner, I only see visits where I am tagged.
+    if (currentUserId === restaurantOwnerId) {
+        q = query(
+            collection(db, `restaurants/${restaurantId}/visits`),
+            orderBy("date", "desc")
+        );
+    } else {
+        q = query(
+            collection(db, `restaurants/${restaurantId}/visits`),
+            where('taggedFriends', 'array-contains', currentUserId),
+            orderBy("date", "desc")
+        );
+    }
 
     return onSnapshot(q, (snapshot) => {
         const visits = snapshot.docs.map(doc => ({
@@ -106,6 +132,15 @@ export const updateVisit = async (restaurantId: string, visitId: string, visitDa
             ...visitData,
             updatedAt: serverTimestamp()
         });
+
+        // Update sharedWith on restaurant if new friends are tagged
+        // NOTE: This adds new tags to the array. Removing tags from visit doesn't remove access to restaurant (simplification)
+        if (visitData.taggedFriends && visitData.taggedFriends.length > 0) {
+            const restaurantRef = doc(db, 'restaurants', restaurantId);
+            await updateDoc(restaurantRef, {
+                sharedWith: arrayUnion(...visitData.taggedFriends)
+            });
+        }
     } catch (error) {
         console.error("Error updating visit: ", error);
         throw error;

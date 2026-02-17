@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChefHat, MapPin, Star } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { subscribeToVisits } from '../services/restaurantService';
 import type { Restaurant } from '../types/Restaurant';
 import type { Visit } from '../types/Visit';
@@ -11,14 +12,17 @@ interface RestaurantListItemProps {
 
 export default function RestaurantListItem({ restaurant }: RestaurantListItemProps) {
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
     const [visits, setVisits] = useState<Visit[]>([]);
 
     useEffect(() => {
-        const unsubscribe = subscribeToVisits(restaurant.id, (data) => {
+        if (!currentUser) return;
+
+        const unsubscribe = subscribeToVisits(restaurant.id, currentUser.uid, restaurant.userId, (data) => {
             setVisits(data);
         });
         return () => unsubscribe();
-    }, [restaurant.id]);
+    }, [restaurant.id, currentUser, restaurant.userId]);
 
     const stats = useMemo(() => {
         if (!visits.length) return null;

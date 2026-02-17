@@ -30,15 +30,23 @@ export default function RestaurantDetails() {
             setLoading(false);
         });
 
-        const unsubscribeVisits = subscribeToVisits(restaurantId, (data) => {
+        return () => {
+            unsubscribeRestaurant();
+        };
+    }, [restaurantId, currentUser]);
+
+    // Subscribe to visits once restaurant is loaded (we need owner ID)
+    useEffect(() => {
+        if (!restaurantId || !currentUser || !restaurant) return;
+
+        const unsubscribeVisits = subscribeToVisits(restaurantId, currentUser.uid, restaurant.userId, (data) => {
             setVisits(data);
         });
 
         return () => {
-            unsubscribeRestaurant();
             unsubscribeVisits();
         };
-    }, [restaurantId, currentUser]);
+    }, [restaurantId, currentUser, restaurant]);
 
     // Fetch user profiles for tagged friends
     useEffect(() => {

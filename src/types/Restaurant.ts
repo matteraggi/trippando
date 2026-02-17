@@ -14,5 +14,6 @@ export interface Restaurant {
     cuisineType?: string;
     tripId?: string; // Optional link to a specific trip
     userId: string; // The user who added this restaurant to their list
+    sharedWith?: string[]; // Array of userIDs who are tagged in visits to this restaurant
     createdAt: Date;
 }
