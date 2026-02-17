@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { X, Calendar, CreditCard, Tag, AlignLeft, User, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { addExpense, getExpense, updateExpense, deleteExpense } from '../services/expenseService';
@@ -11,6 +11,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 export default function AddExpense() {
     const { tripId, expenseId } = useParams<{ tripId: string; expenseId?: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const { currentUser } = useAuth();
     const isEditMode = !!expenseId;
 
@@ -25,7 +26,22 @@ export default function AddExpense() {
     const [loadingMembers, setLoadingMembers] = useState(true);
     const [loadingExpense, setLoadingExpense] = useState(false);
 
-    // Load trip members and expense data
+    // Hydrate from navigation state if available (Instant Load)
+    useEffect(() => {
+        if (location.state && location.state.expense) {
+            const expense = location.state.expense;
+            setAmount(expense.amount.toString());
+            setCurrency(expense.currency);
+            setCategory(expense.category as ExpenseCategory);
+            setDescription(expense.description);
+            setPaidBy(expense.paidBy);
+            // Handle date conversion
+            const d = new Date(expense.date.seconds * 1000); // Firestore timestamp
+            setDate(d.toISOString().split('T')[0]);
+        }
+    }, [location.state]);
+
+    // Load trip members and expense data (if not passed via state)
     useEffect(() => {
         if (!tripId) return;
 
@@ -47,8 +63,8 @@ export default function AddExpense() {
                     }
                 }
 
-                // 2. Load Expense if in Edit Mode
-                if (isEditMode && expenseId) {
+                // 2. Load Expense if in Edit Mode AND not already loaded from state
+                if (isEditMode && expenseId && !location.state?.expense) {
                     setLoadingExpense(true);
                     const expense = await getExpense(expenseId);
                     if (expense) {
@@ -74,7 +90,7 @@ export default function AddExpense() {
             }
         };
         loadData();
-    }, [tripId, expenseId, currentUser, isEditMode]); // Added dependencies, be careful with loops
+    }, [tripId, expenseId, currentUser, isEditMode, location.state]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 

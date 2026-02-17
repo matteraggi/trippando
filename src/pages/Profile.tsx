@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, User, LogOut, Edit2, Check, X, Camera } from 'lucide-react';
+import { ChevronLeft, User, LogOut, Edit2, Check, X, Map, Utensils } from 'lucide-react';
 import { getUserProfile, updateUserNickname } from '../services/userService';
+import { subscribeToTrips } from '../services/tripService';
+import { subscribeToRestaurants } from '../services/restaurantService';
 import type { UserProfile } from '../services/userService';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function Profile() {
     const { currentUser, logout } = useAuth();
@@ -11,30 +14,51 @@ export default function Profile() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [nickname, setNickname] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loadingProfile, setLoadingProfile] = useState(true);
+    const [updatingNickname, setUpdatingNickname] = useState(false);
+
+    // Stats State
+    const [tripsCount, setTripsCount] = useState<number | null>(null);
+    const [restaurantsCount, setRestaurantsCount] = useState<number | null>(null);
 
     useEffect(() => {
-        if (currentUser) {
-            loadProfile();
-        }
+        if (!currentUser) return;
+
+        const loadData = async () => {
+            // 1. Load Profile
+            try {
+                const userProfile = await getUserProfile(currentUser.uid);
+                if (userProfile) {
+                    setProfile(userProfile);
+                    setNickname(userProfile.displayName || '');
+                }
+            } catch (error) {
+                console.error("Failed to load profile", error);
+            } finally {
+                setLoadingProfile(false);
+            }
+        };
+        loadData();
+
+        // 2. Subscribe to Stats
+        const unsubscribeTrips = subscribeToTrips(currentUser.uid, (trips) => {
+            setTripsCount(trips.length);
+        });
+
+        const unsubscribeRestaurants = subscribeToRestaurants(currentUser.uid, (restaurants) => {
+            setRestaurantsCount(restaurants.length);
+        });
+
+        return () => {
+            unsubscribeTrips();
+            unsubscribeRestaurants();
+        };
     }, [currentUser]);
 
-    const loadProfile = async () => {
-        if (!currentUser) return;
-        try {
-            const userProfile = await getUserProfile(currentUser.uid);
-            if (userProfile) {
-                setProfile(userProfile);
-                setNickname(userProfile.displayName || '');
-            }
-        } catch (error) {
-            console.error("Failed to load profile", error);
-        }
-    };
 
     const handleSaveNickname = async () => {
         if (!currentUser || !nickname.trim()) return;
-        setLoading(true);
+        setUpdatingNickname(true);
         try {
             await updateUserNickname(currentUser.uid, nickname.trim());
             setProfile(prev => prev ? { ...prev, displayName: nickname.trim() } : null);
@@ -43,7 +67,7 @@ export default function Profile() {
             console.error("Failed to update nickname", error);
             alert("Failed to update nickname");
         } finally {
-            setLoading(false);
+            setUpdatingNickname(false);
         }
     };
 
@@ -58,6 +82,14 @@ export default function Profile() {
     };
 
     if (!currentUser) return null;
+
+    if (loadingProfile) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <LoadingSpinner size={32} className="text-primary-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 pb-24">
@@ -83,10 +115,6 @@ export default function Profile() {
                                         )}
                                     </div>
                                 </div>
-                                {/* Camera icon placeholder for future photo upload feature */}
-                                {/* <button className="absolute bottom-0 right-0 p-1.5 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition-colors">
-                                    <Camera size={14} />
-                                </button> */}
                             </div>
                         </div>
                     </div>
@@ -104,10 +132,10 @@ export default function Profile() {
                                 />
                                 <button
                                     onClick={handleSaveNickname}
-                                    disabled={loading}
+                                    disabled={updatingNickname}
                                     className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition-colors"
                                 >
-                                    <Check size={18} />
+                                    {updatingNickname ? <LoadingSpinner size={18} /> : <Check size={18} />}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -133,6 +161,35 @@ export default function Profile() {
                             </div>
                         )}
                         <p className="text-sm text-gray-500">{currentUser.email}</p>
+                    </div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                    {/* Trips Stat */}
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2">
+                        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                            <Map size={20} />
+                        </div>
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-gray-900">
+                                {tripsCount !== null ? tripsCount : <div className="h-8 w-8 bg-gray-200 rounded animate-pulse inline-block"></div>}
+                            </p>
+                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Viaggi</p>
+                        </div>
+                    </div>
+
+                    {/* Restaurants Stat */}
+                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center space-y-2">
+                        <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-600">
+                            <Utensils size={20} />
+                        </div>
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-gray-900">
+                                {restaurantsCount !== null ? restaurantsCount : <div className="h-8 w-8 bg-gray-200 rounded animate-pulse inline-block"></div>}
+                            </p>
+                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Ristoranti</p>
+                        </div>
                     </div>
                 </div>
 

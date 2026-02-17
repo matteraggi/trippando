@@ -1,6 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Coffee, Car, Bed, Activity, ShoppingBag, Tag, ChevronRight } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
 import { CATEGORY_LABELS } from '../constants/expenseConstants';
 import { formatShortDate } from '../utils/dateUtils';
 import { convertCurrency } from '../services/currencyService';
@@ -31,8 +31,10 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
     memberNames,
     exchangeRates,
     onAddExpense,
-    onExpenseClick
+    tripId
 }) => {
+    const navigate = useNavigate();
+
     const calculateTotals = () => {
         let totalEUR = 0;
         expenses.forEach(exp => {
@@ -41,8 +43,6 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
         });
         return `€${totalEUR.toFixed(2)}`;
     };
-
-    const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
     return (
         <div className="space-y-4">
@@ -53,7 +53,6 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                         <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1">Totale Speso</p>
                         <p className="text-2xl font-bold text-gray-900">{calculateTotals()}</p>
                     </div>
-                    {/* Add button in the header if desired, or keep it separate */}
                 </div>
             )}
 
@@ -84,10 +83,10 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     <div className="divide-y divide-gray-50">
                         {expenses.map(expense => (
-                            <div
+                            <button
                                 key={expense.id}
-                                onClick={() => onExpenseClick(expense.id)}
-                                className="flex items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100"
+                                onClick={() => navigate(`/trip/${tripId}/expense/${expense.id}`, { state: { expense } })}
+                                className="flex items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer active:bg-gray-100 w-full text-left"
                             >
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${expense.category === 'Food' ? 'bg-orange-100 text-orange-600' :
                                     expense.category === 'Transport' ? 'bg-primary-100 text-primary-600' :
@@ -99,7 +98,17 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                                 <div className="flex-1 min-w-0">
                                     <p className="text-gray-900 font-medium truncate">{expense.description || CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category}</p>
                                     <p className="text-xs text-gray-500 truncate">
-                                        {formatShortDate(expense.date)} • {expense.paidBy ? <span className="text-primary-500 font-medium">{memberNames[expense.paidBy] ? `${memberNames[expense.paidBy]}` : expense.paidBy}</span> : (CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category)}
+                                        {formatShortDate(expense.date)} • {expense.paidBy ? (
+                                            <span className="text-primary-500 font-medium transition-opacity duration-200">
+                                                {memberNames[expense.paidBy] ? (
+                                                    memberNames[expense.paidBy]
+                                                ) : (
+                                                    <span className="inline-block w-16 h-3 bg-gray-200 rounded animate-pulse align-middle ml-1"></span>
+                                                )}
+                                            </span>
+                                        ) : (
+                                            CATEGORY_LABELS[expense.category as keyof typeof CATEGORY_LABELS] || expense.category
+                                        )}
                                     </p>
                                 </div>
                                 <div className="text-right">
@@ -113,7 +122,7 @@ const ExpensesList: React.FC<ExpensesListProps> = ({
                                     )}
                                 </div>
                                 <ChevronRight size={16} className="text-gray-300 ml-2" />
-                            </div>
+                            </button>
                         ))}
                     </div>
                 </div>

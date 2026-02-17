@@ -18,11 +18,15 @@ export default function InstallPWA() {
 
         // Detect iOS
         const userAgent = window.navigator.userAgent.toLowerCase();
+        // Check if it's an iPhone/iPad/iPod
         const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+        // Exclude desktop simulation (Mac/Windows) and ensure it's actually touch capable
+        const isMacWithTouch = userAgent.includes('macintosh') && navigator.maxTouchPoints > 1;
+
         // Check if already in standalone mode
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
 
-        if (isIosDevice && !isStandalone) {
+        if ((isIosDevice || isMacWithTouch) && !isStandalone) {
             setIsIOS(true);
         }
 
